@@ -1,0 +1,17 @@
+[project]
+name = "ofi-synthesiser"
+version = "0.1.0"
+description = "Thesis project."
+authors = [
+    {name = "Kelvin Szolnoky"},
+]
+requires-python = ">=3.8"
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+known_local_folder = ["ofiidentifier"]
+line_length = 120

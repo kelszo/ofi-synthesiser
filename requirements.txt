@@ -1,0 +1,24 @@
+catboost
+humanize
+imbalanced-learn
+ipywidgets
+joblib
+lightgbm
+mlxtend
+numpy
+optuna
+pandas
+scikit-learn
+scikit-plot
+scipy
+seaborn
+setuptools
+tqdm
+watermark
+xgboost
+graphviz
+#autogluon.tabular
+#autoPyTorch
+#auto-sklearn
+#pytorch-lightning
+#torch #pytorch
