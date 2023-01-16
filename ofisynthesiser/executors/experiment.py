@@ -59,12 +59,17 @@ classification_models = {
     "XGBOOST": XGBClassifier,
 }
 
+model_names = classification_models.keys()
+
 synthesising_models = {"NONE": None}
+synth_method_names = synthesising_models.keys()
 
 results = []
 
 for resample_idx in range(RESAMPLES):
-    resample_results = dict.fromkeys(classification_models.keys(), dict.fromkeys(synthesising_models.keys()))
+    resample_results = {
+        model_name: {synth_method_name: [] for synth_method_name in synth_method_names} for model_name in model_names
+    }
 
     logging.info(f"RESAMPLE:{resample_idx}")
     df_raw, df_test = train_test_split(data, test_size=0.2, random_state=resample_idx)
