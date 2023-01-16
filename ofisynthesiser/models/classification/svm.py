@@ -1,45 +1,53 @@
-from typing import Tuple
-
+from typing import Tuple, List
 import numpy as np
 from sklearn.svm import SVC
 import optuna
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 
-class SVM(SVC):
-    def __init__(self, seed: int, **kwargs):
-        self.seed = seed
-        super(SVM, self).__init__(**kwargs, class_weight="balanced", probability=True)
+def hyper_opt_svm(
+    Model: SVC,
+    X: np.ndarray,
+    y: np.ndarray,
+    timeout: int,
+    seed: int,
+    **kwargs,
+) -> dict:
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
 
-    def hyper_opt(self, X, y, eval_set: Tuple[np.ndarray, np.ndarray], timeout: int) -> dict:
-        X_valid, y_valid = eval_set
+    def Objective(trial: optuna.Trial):
+        param = {
+            # "kernel": trial.suggest_categorical("loss", ["linear", "poly", "rbf", "sigmoid"]),
+            "C": trial.suggest_loguniform("C", 0.1, 1000),
+            "random_state": trial.suggest_categorical("random_state", [seed]),
+            "probability": trial.suggest_categorical("probability", [True]),
+        }
 
-        def Objective(trial: optuna.Trial):
-            param = {
-                "penalty": trial.suggest_categorical("penalty", ["l1", "l2"]),
-                "kernel": trial.suggest_categorical("loss", ["linear", "poly", "rbf", "sigmoid"]),
-                "C": trial.suggest_loguniform("C", 0.1, 1000),
-            }
+        model = Model(**param)
+        score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            self.load_from_params(param)
+        return score
 
-            self.fit(X, y)
-            probas_valid = self.predict_proba(X_valid)
+    study = optuna.create_study(
+        direction="maximize",
+        study_name="SVM optimization",
+    )
+    study.optimize(Objective, gc_after_trial=True, timeout=timeout)
 
-            score = roc_auc_score(y_valid, probas_valid)
+    model = Model(probability=True)
+    base_score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            return score
+    hyperopt_score = study.best_value
+    best_params = study.best_params
 
-        study = optuna.create_study(
-            direction="maximize",
-            study_name="SVM optimization",
-        )
-        study.optimize(Objective, gc_after_trial=True, timeout=timeout)
+    if base_score > hyperopt_score:
+        best_params = {}
 
-        best_params = study.best_params
+    best_params["random_state"] = seed
+    best_params["probability"] = True
 
-        # retrain
-        self.load_from_params(best_params)
-        self.fit(X, y)
+    model = Model(**best_params)
+    model.fit(X, y)
 
-        return best_params
+    return best_params

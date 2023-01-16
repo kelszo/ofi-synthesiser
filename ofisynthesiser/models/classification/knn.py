@@ -1,45 +1,50 @@
-from typing import Tuple
-
+from typing import Tuple, List
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 import optuna
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 
-class KNN(KNeighborsClassifier):
-    def __init__(self, seed: int, **kwargs):
-        self.seed = seed
-        super(KNN, self).__init__(**kwargs)
+def hyper_opt_knn(
+    Model: KNeighborsClassifier,
+    X: np.ndarray,
+    y: np.ndarray,
+    timeout: int,
+    seed: int,
+    **kwargs,
+) -> dict:
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
 
-    def hyper_opt(self, X, y, eval_set: Tuple[np.ndarray, np.ndarray], timeout: int) -> dict:
-        X_valid, y_valid = eval_set
+    def Objective(trial: optuna.Trial):
+        param = {
+            "n_neighbors": trial.suggest_int("n_neighbors", 1, 30),
+            "weights": trial.suggest_categorical("weights", ["uniform", "distance"]),
+            "metric": trial.suggest_categorical("metric", ["euclidean", "manhattan", "minkowski"]),
+            "leaf_size": trial.suggest_int("leaf_size", 1, 50),
+        }
 
-        def Objective(trial: optuna.Trial):
-            param = {
-                "n_neighbors": trial.suggest_int("n_neighbors", [3, 10]),
-                "weights": trial.suggest_categorical("weights", ["uniform", "distance"]),
-                "leaf_size": trial.suggest_int("leaf_size", [10, 100]),
-            }
+        model = Model(**param)
+        score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            self.load_from_params(param)
+        return score
 
-            self.fit(X, y)
-            probas_valid = self.predict_proba(X_valid)
+    study = optuna.create_study(
+        direction="maximize",
+        study_name="k-NN optimization",
+    )
+    study.optimize(Objective, gc_after_trial=True, timeout=timeout)
 
-            score = roc_auc_score(y_valid, probas_valid)
+    model = Model()
+    base_score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            return score
+    hyperopt_score = study.best_value
+    best_params = study.best_params
 
-        study = optuna.create_study(
-            direction="maximize",
-            study_name="k-NN optimization",
-        )
-        study.optimize(Objective, gc_after_trial=True, timeout=timeout)
+    if base_score > hyperopt_score:
+        best_params = {}
 
-        best_params = study.best_params
+    model = Model(**best_params)
+    model.fit(X, y)
 
-        # retrain
-        self.load_from_params(best_params)
-        self.fit(X, y)
-
-        return best_params
+    return best_params

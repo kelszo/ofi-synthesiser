@@ -1,65 +1,64 @@
-from typing import Tuple
-
+from typing import Tuple, List
 import numpy as np
 from xgboost import XGBClassifier
 import optuna
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 
-class XGBoost(XGBClassifier):
-    def __init__(self, seed: int, **kwargs):
-        self.seed = seed
-        super(XGBoost, self).__init__(**kwargs, seed=seed, use_label_encoder=False)
+def hyper_opt_xgboost(
+    Model: XGBClassifier,
+    X: np.ndarray,
+    y: np.ndarray,
+    timeout: int,
+    seed: int,
+    **kwargs,
+) -> dict:
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
 
-    def hyper_opt(self, X, y, eval_set: Tuple[np.ndarray, np.ndarray], timeout: int) -> dict:
-        X_valid, y_valid = eval_set
+    def Objective(trial: optuna.Trial):
+        param = {
+            "booster": trial.suggest_categorical("booster", ["gbtree", "gblinear", "dart"]),
+            "lambda": trial.suggest_loguniform("lambda", 1e-8, 1.0),
+            "alpha": trial.suggest_loguniform("alpha", 1e-8, 1.0),
+            "random_state": trial.suggest_categorical("random_state", [seed]),
+            "eval_metric": trial.suggest_categorical("eval_metric", ["auc"]),
+        }
 
-        def Objective(trial: optuna.Trial):
-            param = {
-                "objective": trial.suggest_categorical("objective", ["Logloss", "CrossEntropy"]),
-                "colsample_bylevel": trial.suggest_float("colsample_bylevel", 0.01, 0.1, log=True),
-                "depth": trial.suggest_int("depth", 1, 12),
-                "boosting_type": trial.suggest_categorical("boosting_type", ["Ordered", "Plain"]),
-                "bootstrap_type": trial.suggest_categorical("bootstrap_type", ["Bayesian", "Bernoulli", "MVS"]),
-                "eval_metric": trial.suggest_categorical("eval_metric", ["AUC"]),
-                "random_state": trial.suggest_categorical("random_state", [self.seed]),
-                "cat_features": self.get_cat_feature_indices(),
-                "l2_leaf_reg": trial.suggest_float("l2_leaf_reg", 1.0, 5.5, step=0.5),
-                "train_dir": "./tmp",
-            }
+        if param["booster"] == "gbtree" or param["booster"] == "dart":
+            param["max_depth"] = trial.suggest_int("max_depth", 1, 9)
+            param["eta"] = trial.suggest_loguniform("eta", 1e-8, 1.0)
+            param["gamma"] = trial.suggest_loguniform("gamma", 1e-8, 1.0)
+            param["grow_policy"] = trial.suggest_categorical("grow_policy", ["depthwise", "lossguide"])
+        if param["booster"] == "dart":
+            param["sample_type"] = trial.suggest_categorical("sample_type", ["uniform", "weighted"])
+            param["normalize_type"] = trial.suggest_categorical("normalize_type", ["tree", "forest"])
+            param["rate_drop"] = trial.suggest_loguniform("rate_drop", 1e-8, 1.0)
+            param["skip_drop"] = trial.suggest_loguniform("skip_drop", 1e-8, 1.0)
 
-            if param["objective"] == "Logloss":
-                _, counts = np.unique(y, return_counts=True)
-                scale_pos_weight = counts[0] / counts[1]
-                param["scale_pos_weight"] = trial.suggest_categorical("scale_pos_weight", [scale_pos_weight])
+        model = Model(**param)
+        score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            if param["bootstrap_type"] == "Bayesian":
-                param["bagging_temperature"] = trial.suggest_float("bagging_temperature", 0, 10)
-            elif param["bootstrap_type"] == "Bernoulli":
-                param["subsample"] = trial.suggest_float("subsample", 0.1, 1, log=True)
+        return score
 
-            self.load_from_params(param)
+    study = optuna.create_study(
+        direction="maximize",
+        study_name="XGBoost optimization",
+    )
+    study.optimize(Objective, gc_after_trial=True, timeout=timeout)
 
-            self.fit(X, y, eval_set=[(X_valid, y_valid)])
+    model = Model()
+    base_score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            probas_valid = self.predict_proba(X_valid)
+    hyperopt_score = study.best_value
+    best_params = study.best_params
 
-            score = roc_auc_score(y_valid, probas_valid)
+    if base_score > hyperopt_score:
+        best_params = {}
 
-            return score
+    best_params["random_state"] = seed
 
-        study = optuna.create_study(
-            direction="maximize",
-            study_name="CatBoost optimization",
-        )
-        study.optimize(Objective, gc_after_trial=True, timeout=timeout)
+    model = Model(**best_params)
+    model.fit(X, y)
 
-        best_params = study.best_params
-        best_params["cat_features"] = self.get_cat_feature_indices()
-        best_params["train_dir"] = "./tmp"
-
-        # retrain
-        self.load_from_params(best_params)
-        self.fit(X, y)
-
-        return best_params
+    return best_params

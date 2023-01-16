@@ -1,23 +1,37 @@
-import pdb
+import pickle
+from datetime import datetime
 
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score
 
-from ofisynthesiser.data import target, preprocessor
-from ofisynthesiser.models.classification import CatBoost, XGBoost, LightGBM, SVM, KNN, Logit, ExtraTrees, RandomForest
-from ofisynthesiser.models.synthesising import CTGAN
-
+from ofisynthesiser.data import preprocessor, target
+from ofisynthesiser.utils import logging
+from ofisynthesiser.models.classification import (
+    SVC,
+    CatBoostClassifier,
+    ExtraTreesClassifier,
+    KNeighborsClassifier,
+    LGBMClassifier,
+    LogisticRegression,
+    RandomForestClassifier,
+    XGBClassifier,
+    hyper_opt_model,
+)
+from ofisynthesiser.models.synthesising import generate_data_copula_gan, generate_data_tvae
 from ofisynthesiser.utils import seed_everything
+
+start_time = datetime.now().strftime("%y%m%d-%H%M")
 
 SEED = 2023
 RESAMPLES = 100
+HYPEROPT_TIMEOUT = 60 * 60
 DEBUG = True
+HYPERPARAMS_PATH = ""
 
 if DEBUG:
-    print("DEBUGGING MODE")
+    logging.info("DEBUGGING MODE")
     RESAMPLES = 3
+    HYPEROPT_TIMEOUT = 1
 
 seed_everything(SEED)
 
@@ -27,69 +41,87 @@ data = data[data[target].notna()]
 data[target] = data[target].replace("No", 0)
 data[target] = data[target].replace("Yes", 1)
 
+best_params = {}
+save_params = False
+
+if HYPERPARAMS_PATH != "":
+    with open(HYPERPARAMS_PATH, "rb") as handle:
+        best_params = pickle.load(handle)
+
 classification_models = {
-    "CATBOOST": CatBoost,
-    "XGBOOST": XGBoost,
-    "LIGHTGBM": LightGBM,
-    "SVM": SVM,
-    "KNN": KNN,
-    "LOGIT": Logit,
-    "EXTRATREES": ExtraTrees,
-    "RANDOMFOREST": RandomForest,
+    "CATBOOST": CatBoostClassifier,
+    "EXTRATREES": ExtraTreesClassifier,
+    "KNN": KNeighborsClassifier,
+    "LIGHTGBM": LGBMClassifier,
+    "LOGIT": LogisticRegression,
+    "RANDOMFOREST": RandomForestClassifier,
+    "SVM": SVC,
+    "XGBOOST": XGBClassifier,
 }
 
 synthesising_models = {"NONE": None}
 
+results = []
+
 for resample_idx in range(RESAMPLES):
-    print(f"RESAMPLE:{resample_idx}")
+    resample_results = dict.fromkeys(classification_models.keys(), dict.fromkeys(synthesising_models.keys()))
+
+    logging.info(f"RESAMPLE:{resample_idx}")
     df_raw, df_test = train_test_split(data, test_size=0.2, random_state=resample_idx)
 
+    y_raw = df_raw[target].to_numpy()
+    X_raw = df_raw.drop(columns=[target])
+    X_raw = preprocessor.fit_transform(X_raw)
+
+    y_test = df_test[target].to_numpy()
+    X_test = df_test.drop(columns=[target])
+    X_test = preprocessor.transform(X_test)
+
+    resample_results["TARGET"] = y_test
+
+    for model_name in classification_models:
+        Model = classification_models[model_name]
+
+        if resample_idx == 0 and model_name not in best_params:
+            logging.info(f"HYPER OPTIMISING: {model_name}")
+            best_params[model_name] = hyper_opt_model(Model, X_raw, y_raw, timeout=HYPEROPT_TIMEOUT, seed=SEED)
+            save_params = True
+
+        model = Model(**best_params[model_name])
+
+        model.fit(X_raw, y_raw)
+        resample_results[model_name]["NONE"] = model.predict_proba(X_test)[:, 1]
+
     for synth_name in synthesising_models:
-        Synth = synthesising_models[synth_name]
-        y_raw = df_raw[target].to_numpy()
-        X_raw = df_raw.drop(columns=[target])
-        X_raw = preprocessor.fit_transform(X_raw)
+        synth = synthesising_models[synth_name]
 
-        y_test = df_test[target].to_numpy()
-        X_test = df_test.drop(columns=[target])
-        X_test = preprocessor.transform(X_test)
+        if synth is None:
+            continue
 
-        if Synth is not None:
-            synth = Synth(seed=SEED, debug=DEBUG)
-            synth.fit(df_raw)
+        df_synth = synth(df_raw, debug=DEBUG)
 
-            df_synth = synth.sample(len(df_raw))
+        y_synth = df_synth[target].to_numpy()
+        X_synth = df_synth.drop(columns=[target])
+        X_synth = preprocessor.transform(X_synth)
 
-            y_synth = df_synth[target].to_numpy()
-            X_synth = df_synth.drop(columns=[target])
-            X_synth = preprocessor.transform(X_synth)
-
-            y_comb = y_raw + y_synth
-            X_comb = X_raw + X_synth
+        y_comb = y_raw + y_synth
+        X_comb = X_raw + X_synth
 
         for model_name in classification_models:
             Model = classification_models[model_name]
+            model = Model(**best_params[model_name])
 
-            model = Model(seed=SEED)
+            model.fit(X_synth, y_synth)
+            resample_results[model_name][synth_name] = model.predict_proba(X_test)[:, 1]
 
-            model.fit(X_raw, y_raw)
-            probas_raw = model.predict_proba(X_test)[:, 1]
-            score_raw = roc_auc_score(y_test, probas_raw)
+            model.fit(X_comb, y_comb)
+            resample_results[model_name][f"{synth_name}:COMB"] = model.predict_proba(X_test)[:, 1]
 
-            if Synth is not None:
-                model.fit(X_synth, y_synth)
-                probas_synth = model.predict_proba(X_test)[:, 1]
-                score_synth = roc_auc_score(y_test, probas_synth)
+    results.append(resample_results)
 
-                model.fit(X_comb, y_comb)
-                probas_comb = model.predict_proba(X_test)[:, 1]
-                score_comb = roc_auc_score(y_test, probas_comb)
+if save_params:
+    with open(f"out/{start_time}-hyperparams.pickle", "wb") as handle:
+        pickle.dump(best_params, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-            if Synth is not None:
-                print("MODEL:", model_name)
-                print("RAW SCORE:", score_raw)
-                print("SYNTH SCORE:", score_synth)
-                print("COMB SCORE:", score_comb, end="\n")
-            else:
-                print("MODEL:", model_name)
-                print("RAW SCORE:", score_raw, end="\n")
+with open(f"out/{start_time}-results.pickle", "wb") as handle:
+    pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)

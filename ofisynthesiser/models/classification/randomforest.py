@@ -1,44 +1,53 @@
-from typing import Tuple
-
+from typing import Tuple, List
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import optuna
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 
-class RandomForest(RandomForestClassifier):
-    def __init__(self, seed: int, **kwargs):
-        self.seed = seed
-        super(RandomForest, self).__init__(**kwargs, random_state=seed, class_weight="balanced")
+def hyper_opt_random_forest(
+    Model: RandomForestClassifier,
+    X: np.ndarray,
+    y: np.ndarray,
+    timeout: int,
+    seed: int,
+    **kwargs,
+) -> dict:
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
 
-    def hyper_opt(self, X, y, eval_set: Tuple[np.ndarray, np.ndarray], timeout: int) -> dict:
-        X_valid, y_valid = eval_set
+    def Objective(trial: optuna.Trial):
+        param = {
+            "n_estimators": trial.suggest_int("n_estimators", 50, 1000),
+            "max_depth": trial.suggest_int("max_depth", 4, 50),
+            "min_samples_split": trial.suggest_int("min_samples_split", 1, 150),
+            "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 60),
+            "random_state": trial.suggest_categorical("random_state", [seed]),
+        }
 
-        def Objective(trial: optuna.Trial):
-            param = {
-                "n_estimators": trial.suggest_int("n_estimators", 100, 1000),
-                "criterion": trial.suggest_categorical("criterion", ["gini", "entropy"]),
-            }
+        model = Model(**param)
+        score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            self.load_from_params(param)
+        return score
 
-            self.fit(X, y)
-            probas_valid = self.predict_proba(X_valid)
+    study = optuna.create_study(
+        direction="maximize",
+        study_name="RandomForest optimization",
+    )
+    study.optimize(Objective, gc_after_trial=True, timeout=timeout)
 
-            score = roc_auc_score(y_valid, probas_valid)
+    model = Model()
+    base_score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            return score
+    hyperopt_score = study.best_value
+    best_params = study.best_params
 
-        study = optuna.create_study(
-            direction="maximize",
-            study_name="RandomForest optimization",
-        )
-        study.optimize(Objective, gc_after_trial=True, timeout=timeout)
+    if base_score > hyperopt_score:
+        best_params = {}
 
-        best_params = study.best_params
+    best_params["random_state"] = seed
 
-        # retrain
-        self.load_from_params(best_params)
-        self.fit(X, y)
+    model = Model(**best_params)
+    model.fit(X, y)
 
-        return best_params
+    return best_params

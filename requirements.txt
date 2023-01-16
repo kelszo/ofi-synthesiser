@@ -10,6 +10,7 @@ sdv
 #tabpfn
 tqdm
 xgboost
+smote_variants
 
 # Dev deps
 black

@@ -1,1 +1,2 @@
-from ofisynthesiser.models.synthesising.ctgan import CTGAN
+from ofisynthesiser.models.synthesising.copulagan import generate_data_copula_gan
+from ofisynthesiser.models.synthesising.tvae import generate_data_tvae

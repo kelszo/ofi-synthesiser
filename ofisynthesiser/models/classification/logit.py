@@ -1,44 +1,48 @@
-from typing import Tuple
-
+from typing import Tuple, List
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 import optuna
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 
-class Logit(LogisticRegression):
-    def __init__(self, seed: int, **kwargs):
-        self.seed = seed
-        super(Logit, self).__init__(**kwargs, random_state=seed, class_weight="balanced")
+def hyper_opt_logit(
+    Model: LogisticRegression,
+    X: np.ndarray,
+    y: np.ndarray,
+    timeout: int,
+    seed: int,
+    **kwargs,
+) -> dict:
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
 
-    def hyper_opt(self, X, y, eval_set: Tuple[np.ndarray, np.ndarray], timeout: int) -> dict:
-        X_valid, y_valid = eval_set
+    def Objective(trial: optuna.Trial):
+        param = {
+            "C": trial.suggest_float("logreg_c", 1e-10, 1e10),
+            "max_iter": trial.suggest_categorical("max_iter", [2500]),
+        }
 
-        def Objective(trial: optuna.Trial):
-            param = {
-                "penalty": trial.suggest_categorical("penalty", ["l1", "l2"]),
-                "C": trial.suggest_loguniform("C", 0.1, 1000),
-            }
+        model = Model(**param)
+        score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            self.load_from_params(param)
+        return score
 
-            self.fit(X, y)
-            probas_valid = self.predict_proba(X_valid)
+    study = optuna.create_study(
+        direction="maximize",
+        study_name="Logit optimization",
+    )
+    study.optimize(Objective, gc_after_trial=True, timeout=timeout)
 
-            score = roc_auc_score(y_valid, probas_valid)
+    model = Model()
+    base_score = cross_val_score(model, X, y, scoring="roc_auc", cv=skf).mean()
 
-            return score
+    hyperopt_score = study.best_value
+    best_params = study.best_params
 
-        study = optuna.create_study(
-            direction="maximize",
-            study_name="CatBoost optimization",
-        )
-        study.optimize(Objective, gc_after_trial=True, timeout=timeout)
+    if base_score > hyperopt_score:
+        best_params = {}
 
-        best_params = study.best_params
+    model = Model(**best_params)
+    model.fit(X, y)
 
-        # retrain
-        self.load_from_params(best_params)
-        self.fit(X, y)
-
-        return best_params
+    return best_params
