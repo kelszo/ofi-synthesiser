@@ -5,13 +5,57 @@ description = "Thesis project."
 authors = [
     {name = "Kelvin Szolnoky"},
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.8,<3.10"
 
 [tool.black]
 line-length = 120
-target-version = ["py310"]
+target-version = ["py39"]
 
 [tool.isort]
 profile = "black"
 known_local_folder = ["ofiidentifier"]
 line_length = 120
+[tool.poetry]
+name = "ofi-synthesiser"
+version = "0.1.0"
+description = ""
+authors = ["Kelvin John Falk Szolnoky <me@kelszo.com>"]
+readme = "README.md"
+packages = [{include = "ofi_synthesiser"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.10"
+catboost = "^1.1.1"
+imbalanced-learn = "^0.10.1"
+joblib = "^1.2.0"
+lightgbm = "^3.3.4"
+numpy = "^1.24.1"
+optuna = "^2"
+pandas = "^1.5.2"
+scikit-learn = "^1.2.0"
+tqdm = "^4.64.1"
+xgboost = "^1.7.3"
+sdv = "^0.17.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+python-lsp-server = "^1.7.0"
+pyls-isort = "^0.2.2"
+jupyter-core = "^5.1.3"
+nbconvert = "^7.2.7"
+pyls-black = "^0.4.7"
+jedi = "^0.18.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies.torch]
+version = "1.13.1+cpu"
+source = "torch"
+
+[[tool.poetry.source]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cpu"
+default = false
+secondary = true

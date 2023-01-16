@@ -132,4 +132,8 @@ dmypy.json
 .vscode
 
 # other
+/data
 local
+/tmp
+catboost_info
+/out
