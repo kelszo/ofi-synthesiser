@@ -23,7 +23,7 @@ let
     };
     config = {
       Env = [ ''LD_LIBRARY_PATH = "${nvidia_x11}/lib"'' "PATH=/bin:$PATH" ];
-      Cmd = [ "python" "-m" "ofisynthesiser.executors.experiment" ];
+      Cmd = [ "python" "-m" "ofisynthesiser.executors.run" ];
     };
   };
 in img
