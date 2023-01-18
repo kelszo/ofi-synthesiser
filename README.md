@@ -28,7 +28,7 @@ Thesis project generating synthetic data for the Swedish Trauma Registry (SweTra
 ```
 
 ## Setup
-Use `$ nix-shell` to enter the dev environment. Alternatively build the docker (podman) image with: `$ docker_build && docker_load`
+Use `$ nix-shell` to enter the dev environment. Alternatively build the docker (podman) image with: `$ make docker_build && make docker_load`
 
 To run executors use: `$ python -m <dir.to.file>` (ex. `$ python -m ofisynthesiser.executors.run`)
 

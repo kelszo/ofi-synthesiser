@@ -11,7 +11,7 @@ let
     requirements = builtins.readFile ./requirements.txt;
   };
 
-  nvidia_x11 = pkgs.linuxKernel.packages.linux_5_10.nvidia_x11;
+  nvidia_x11 = pkgs.linuxKernel.packages.linux_4_14.nvidia_x11;
 
   img = pkgs.dockerTools.buildImage {
     name = "ofi-synthesiser";

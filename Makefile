@@ -5,4 +5,4 @@ docker_load:
 	podman load < ./local/docker-image
 
 docker_run:
-	podman run --rm localhost/ofi-synthesiser:latest
+	podman run --rm localhost/ofi-synthesiser:latest --volume=./out:/out
