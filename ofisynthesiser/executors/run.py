@@ -25,13 +25,15 @@ start_time = datetime.now().strftime("%y%m%d-%H%M")
 SEED = 2023
 RESAMPLES = 100
 HYPEROPT_TIMEOUT = 60 * 60
-DEBUG = True
+CUDA = True
+DEBUG = False
 HYPERPARAMS_PATH = ""
 
 if DEBUG:
     logging.info("DEBUGGING MODE")
     RESAMPLES = 3
     HYPEROPT_TIMEOUT = 1
+    CUDA = False
 
 seed_everything(SEED)
 
@@ -103,7 +105,7 @@ for resample_idx in range(RESAMPLES):
         if synth is None:
             continue
 
-        df_synth = synth(df_raw, debug=DEBUG)
+        df_synth = synth(df_raw, cuda=CUDA, debug=DEBUG)
 
         y_synth = df_synth[target].to_numpy()
         X_synth = df_synth.drop(columns=[target])
