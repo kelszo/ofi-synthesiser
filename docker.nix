@@ -1,4 +1,8 @@
-{ pkgs ? import <nixpkgs> { } }:
+{ pkgs ? import <nixpkgs> {
+  config.allowUnfree = true;
+  config.cudaSupport = true;
+  config.cudnnSupport = true;
+}, lib ? pkgs.lib, cuda ? false }:
 
 let
   mach-nix = import (builtins.fetchGit {
@@ -11,18 +15,18 @@ let
     requirements = builtins.readFile ./requirements.txt;
   };
 
-  nvidia_x11 = pkgs.linuxKernel.packages.linux_4_14.nvidia_x11;
-
-  img = pkgs.dockerTools.buildImage {
+  img = pkgs.dockerTools.buildLayeredImage {
     name = "ofi-synthesiser";
-    tag = "latest";
-    copyToRoot = pkgs.buildEnv {
-      name = "image-root";
-      paths = [ ./. py pkgs.cudatoolkit nvidia_x11 ];
-      pathsToLink = [ "/bin" "/ofisynthesiser" "/data" ];
-    };
+    tag = if cuda ? true then "cuda" else "latest";
+    contents = [ ./. py pkgs.busybox ]
+      ++ lib.optionals cuda [ pkgs.cudatoolkit ];
+
     config = {
-      Env = [ ''LD_LIBRARY_PATH = "${nvidia_x11}/lib"'' "PATH=/bin:$PATH" ];
+      Env = [ "PATH=/bin:$PATH" ] ++ lib.optionals cuda [
+        "LD_LIBRARY_PATH=/usr/lib64"
+        "NVIDIA_DRIVER_CAPABILITIES=compute,utility"
+        "NVIDIA_VISIBLE_DEVICES=all"
+      ];
       Cmd = [ "python" "-m" "ofisynthesiser.executors.run" ];
     };
   };

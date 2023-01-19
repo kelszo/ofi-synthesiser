@@ -3,8 +3,8 @@ import sdv.tabular
 
 
 def generate_data_tvae(data: pd.DataFrame, cuda: bool, debug: bool = False) -> pd.DataFrame:
-    epochs = 300
-    batch_size = 500
+    epochs = 500
+    batch_size = 2000
 
     if debug:
         epochs = 3

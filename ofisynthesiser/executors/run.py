@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
+import torch
 
 from ofisynthesiser.data import preprocessor, target
 from ofisynthesiser.utils import logging
@@ -25,7 +26,6 @@ start_time = datetime.now().strftime("%y%m%d-%H%M")
 SEED = 2023
 RESAMPLES = 100
 HYPEROPT_TIMEOUT = 60 * 60
-CUDA = True
 DEBUG = False
 HYPERPARAMS_PATH = ""
 
@@ -33,9 +33,15 @@ if DEBUG:
     logging.info("DEBUGGING MODE")
     RESAMPLES = 3
     HYPEROPT_TIMEOUT = 1
-    CUDA = False
 
 seed_everything(SEED)
+
+if torch.cuda.is_available():
+    logging.info(f"SUCCESSFULLY USING CUDA")
+    CUDA = True
+else:
+    logging.info(f"FAILED TO LOAD CUDA")
+    CUDA = False
 
 data = pd.read_csv("./data/raw/combined_dataset.csv")
 # Remove Na OFI cases
@@ -63,10 +69,13 @@ classification_models = {
 
 model_names = classification_models.keys()
 
-synthesising_models = {"NONE": None}
+synthesising_models = {"NONE": None, "CTGAN": generate_data_copula_gan, "TVAE": generate_data_tvae}
 synth_method_names = synthesising_models.keys()
 
 results = []
+
+with open(f"out/{start_time}.lock", "w") as f:
+    f.write("")
 
 for resample_idx in range(RESAMPLES):
     resample_results = {
