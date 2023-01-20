@@ -13,13 +13,16 @@ with open("out/230116-2003-results.pickle", "rb") as handle:
 
 model_names = list(results[0].keys())
 model_names.remove("TARGET")
+model_names.remove("RESAMPLE")
 synth_method_names = list(results[0][model_names[0]].keys())
 
 auc_per_resample = {model_name: {synth_method: [] for synth_method in synth_method_names} for model_name in model_names}
 
 for resample in results:
     target = resample["TARGET"]
+    resample_idx = resample["RESAMPLE"]
     del resample["TARGET"]
+    del resample["RESAMPLE"]
 
     for model_name in resample:
         model_results = resample[model_name]
