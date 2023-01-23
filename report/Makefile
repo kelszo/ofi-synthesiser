@@ -1,0 +1,2 @@
+build_word:
+	pandoc -F pandoc-crossref -M autoEqnLabels --citeproc -t markdown-citations -s main.tex -f latex -t docx -o out/main.docx --bibliography=main.bib --csl=vancouver.csl --reference-doc=templates/template_thesis.docx

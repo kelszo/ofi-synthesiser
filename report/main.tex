@@ -1,0 +1,98 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage[english]{babel}
+
+% include pdf
+\usepackage[final]{pdfpages}
+
+% quotes
+\usepackage{csquotes}
+
+% Acronyms
+\usepackage[nopostdot,style=super,nonumberlist,toc,nogroupskip,acronym]{glossaries}
+
+% For typesetting
+\usepackage{lipsum}  
+
+% Set paragraph spacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex}
+\def\ni{\noindent}
+
+\makenoidxglossaries
+
+\newacronym{ais}{AIS}{abbreviated injury scale}
+\newacronym{auc}{AUC}{area under the receiver operating characteristic curve}
+\newacronym{kuh}{KUH}{Karolinska University Hospital}
+\newacronym{mam}{M\&M}{morbidity and mortality}
+\newacronym{ml}{ML}{machine learning}
+\newacronym{ofi}{OFI}{opportunity for improvement}
+\newacronym{qi}{QI}{quality improvement}
+
+% Glossary style
+\newglossarystyle{csuper}{%
+    \setglossarystyle{super}%
+    \renewcommand{\glossentry}[2]{%
+        \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
+        \Glossentrydesc{##1}\glspostdescription\space ##2\tabularnewline
+    }
+    \setlength{\glsdescwidth}{0.75\linewidth}
+}
+
+% References
+\input{vancouver.tex} % imports biblatex
+\addbibresource{main.bib}
+
+
+\begin{document}
+\begin{titlepage}
+    \includepdf[pages=-,pagecommand={},fitpaper=true,]{title_page.pdf}
+\end{titlepage}
+
+\pagenumbering{Roman}
+
+\textbf{Titel}
+
+\lipsum[1]
+
+\vfill
+
+\textbf{Title}
+
+\lipsum[1]
+
+\vfill
+
+\textit{Keywords}: Machine learning; Trauma; Medical audit; Trauma care quality improvement; Data synthesis; Prediction
+
+\newpage
+
+\glsaddall
+\printnoidxglossary[type=acronym,style=csuper]
+
+\newpage
+\pagenumbering{arabic}
+
+\section{Introduction}
+test \cite{ringdal_utstein_2008}
+
+\subsection{Aim}
+
+\section{Materials and Methods}
+
+\subsection{Statistics}
+
+\subsection{Ethical Considerations}
+
+\section{Results}
+
+\section{Discussion}
+
+\section{Conclusions}
+
+\section*{Contributions}
+
+\section*{Acknowledgement}
+
+\printbibliography
+
+\end{document}
