@@ -1,4 +1,4 @@
-\usepackage[style=numeric,
+\usepackage[style=numeric-comp,
     backend=biber,
     sorting=none,
     url=false,
@@ -13,35 +13,8 @@
 \renewcommand*{\finentrypunct}{}
 \renewcommand*{\bibpagespunct}{}
 
-% Dot instead av brackets in references
-\DeclareFieldFormat{labelnumberwidth}{\mkbibbold{#1\adddot}}
-
-% Lastname followed by initials format
-\DeclareNameAlias{sortname}{family-given}
-\DeclareNameAlias{default}{family-given}
-\renewcommand*{\revsdnamepunct}{}
-
-\DeclareSourcemap{%
-    \maps[datatype=bibtex]{
-        % Journal abbreviations
-        \map[overwrite]{
-            \step[fieldsource=shortjournal]
-            \step[fieldset=journaltitle,origfieldval]
-        }
-    }
-}
-
-% remove in
+% Remove 'in:' string
 \renewbibmacro{in:}{}
-% remove pp
-\DeclareFieldFormat*{pages}{#1}
-% reformat doi
-\DeclareFieldFormat*{doi}{\url{https://doi.org/#1}}
-%remove quotation marks around title
-\DeclareFieldFormat*{title}{#1}
-
-
-\DeclareFieldFormat{journaltitle}{\mkbibemph{#1}\isdot}
 
 % Provide three letter month names
 \newcommand*{\shortmonth}[1]{
@@ -63,48 +36,92 @@
     }
 }
 
-\DeclareFieldFormat*{number}{\mkbibparens{#1}}
+% Family name first
+\DeclareNameAlias{default}{family-given}
 
-\DeclareFieldFormat*{date}{\thefield{year}}
+% Remove unwanted formatting
+\DeclareFieldFormat*{title}{#1}
+\DeclareFieldFormat*{journaltitle}{#1}
+\DeclareFieldFormat*{labelnumberwidth}{#1\adddot}
+\DeclareFieldFormat*{pages}{:\mkcomprange{#1}}
+\DeclareFieldFormat*{url}{Available from: \url{#1}}
+\DeclareFieldFormat*[article]{issue}{(#1)}
+\DeclareFieldFormat*{date}{
+    \thefield{year}%
+    \shortmonth{\thefield{month}}\addspace
+    \thefield{day}\isdot
+}
 
-% Code adapted from biblatex-nejm package
+\DeclareSourcemap{
+    \maps[datatype=bibtex]{
+        \map[overwrite=true]{
+            \step[fieldsource=journaltitle, match=\regexp{(\.)}, replace={}]
+            \step[fieldsource=journaltitle, match=\regexp{(\$)}, replace={.}]
+        }
+    }
+}
 
 \renewbibmacro*{volume+number+eid}{
     \printfield{volume}%
-    \setunit{}%
-    \printfield{number}%
-    \addcolon%
+    \printfield{issue}%
     \printfield{eid}%
 }
-
+%Order year;volume:page
 \renewbibmacro*{issue+date}{
-    \usebibmacro{date}
+    \setunit*{\addspace}%
+    \usebibmacro{date}%
+    \newunit%
 }
 
 \renewbibmacro*{journal+issuetitle}{
     \usebibmacro{journal}%
-    \iffieldundef{series}%
-    \adddot%
+    \addperiod%
+    \iffieldundef{series}
     {}
-    {\newunit%
+    {\newunit
         \printfield{series}}%
-    \setunit{\addspace}%
+    \setunit*{\addspace}%
     \usebibmacro{issue+date}%
-    \setunit{\addsemicolon}%
+    \setunit*{\addsemicolon\addspace}%
     \usebibmacro{volume+number+eid}%
     \usebibmacro{issue}%
     \newunit}
 
-% compress page numbers. E.g. XYZ-XAB -> XYZ-AB
-\DeclareFieldFormat{postnote}{\mkcomprange[{\mkpageprefix[pagination]}]{#1}}
-\DeclareFieldFormat{pages}{\mkcomprange{#1}}
 
-% Compress ranges where lower limit > 100
-\setcounter{mincomprange}{100}
+\DeclareFieldFormat*{urldate}{
+    [cited \thefield{urlyear}%
+            \shortmonth{\thefield{urlmonth}}\addspace%
+            \printfield{urlday}]
+}
 
-% Don't compress beyond the fourth digit
-\setcounter{maxcomprange}{1000}
+\DeclareBibliographyDriver{database}{%
+    \printfield{title} [Internet]%
+    \setunit*{\addperiod\space}%
+    \printlist{location}%
+    \setunit*{\addcolon\space}% 
+    \printnames{author}%
+    \setunit*{\addsemicolon\space}%
+    \printfield{year}%
+    \setunit*{ - .}%
+    \printurldate{}%
+    \setunit*{\addperiod\space}%
+    \printfield{url}%
+    \finentry}
 
-% Display compressed upper limit with at least two digits,
-% unless leading digit is zero
-\setcounter{mincompwidth}{10}
+\DeclareBibliographyDriver{report}{%
+    \usebibmacro{author}%
+    \setunit*{\addperiod\space}%
+    \printfield{title}%
+    \setunit*{\addperiod\space}%
+    \printlist{location}%
+    \setunit*{\addcolon\space}% 
+    \printlist{institution}%
+    \setunit*{\addsemicolon\space}%
+    \printfield{year}%
+    \setunit*{\addperiod\space}%
+    \finentry}
+
+\renewrobustcmd{\mkbibbrackets}{\mkbibparens}
+
+% \let\bibopenbracket\bibopenparen
+%\let\bibclosebracket\bibcloseparen
