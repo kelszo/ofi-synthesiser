@@ -11,7 +11,11 @@
 \PassOptionsToPackage{hyphens}{url}
 \usepackage[hidelinks]{hyperref}
 
+\usepackage{graphics}
+
+% Special/larger tables
 \usepackage{longtable}
+\usepackage{tabularx}
 
 % quotes
 \usepackage{csquotes}
@@ -33,7 +37,7 @@
 \usepackage{array} % centering + width fix
 
 \usepackage{caption} 
-\captionsetup{labelfont=bf,labelsep=period}
+\captionsetup{labelfont=bf,labelsep=period,font=footnotesize,}
 \usepackage{cleveref}
 
 % Fix section titles size/format
@@ -227,22 +231,95 @@ All model development and data preprocessing was performed in Python. The model 
 A pre-processor was developed to be able to pre-process both the training and test data without any leakage. This was done by rescaling continuous features using Yeo-Johnson's power transformation \cite{yeo_new_2000} and encoding nominal features using one-hot encoding. Ordinal features were left unchanged. Continuous features were imputed by using the mean of the feature, ordinal by using the most frequent value, and nominal by adding an "unknown" category. An exception was made for both the pre-hospital and emergency department blood pressure and respiratory rate, they were imputed by using the mean value of the revised trauma score category \cite{ringdal_utstein_2008}, if it existed. The pre-processor was trained and applied on the training data to be there after only applied to the test data, thus no data leakage occurred between the test and training set.
 
 \subsubsection*{Classification models}
-As suggested by Attegrim and Szolnoky et al. the following models were traditional methods were implemented with scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, decision tree, support vector machine, k-nearest neighbour. The following boosting methods were implemented using the provided Python implementation: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was run all models, using the first resamples training data, and their suggested parameters (found either by the source documentation or implementation documentation) for a total of 1 hour each.
+As suggested by Attegrim and Szolnoky et al. the following models were traditional methods were implemented with scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, decision tree, support vector machine, k-nearest neighbour. The following boosting methods were implemented using the provided Python implementation: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was run all models, using the first resamples training data through a 5-fold cross validation. The suggested parameters, found either by the source documentation or implementation documentation, were optimised using Tree-structured Parzen Estimator \cite{bergstra_algorithms_2011} for a total of 1 hour per model.
 
 \subsubsection*{Synthesising models}
-The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} model proposed by Xu et al. was implemented with the help of the Synthetic Data Vault framework \cite{patki_sdv_2016} available in Python. The batch size was increased to 1000 samples to include more minority cases in a single batch. Otherwise the standard parameters provided were used.
+The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} models were implemented with the help of the Synthetic Data Vault framework \cite{patki_sdv_2016} available in Python. The batch size was increased to 1000 samples to include more minority cases in a single batch. Otherwise the standard parameters provided were used.
 
 \subsection{Statistical Analysis}
 The performance of the models was measured using and compared using \acrfull{auc}. The performance was compared by calculating the \acrshort{auc} value on the test split, additionally the \acrshort{auc} delta to each other model was calculated.
 
 All statistical analyses were done using Python. The analyses were run on an 80\%-20\% train-test split 100 times using random resampling without replacement. The estimated 95\% \acrfull{ci} using $t$-distribution was calculated for \acrshort{auc} as well as the delta values using all resamples.
 
-Synthesising models were trained on each resamples raw training data. The synthesising models output an equally large dataset as the training input. The classification models were trained on either the pre-processed resample's training data, the pre-processed synthesising models output, or a combination of both. For each training cycle the classification models were tested on the pre-processed test data from the train-test split.
+Synthesising models were trained on each resamples raw training data. The synthesising models output an equally large dataset as the training input. The classification models were trained on either the pre-processed resample's training data, the pre-processed synthesising models output, or a combination of both. For each training cycle the classification models were tested on the pre-processed test data from the train-test split and the \acrshort{auc} was calculated.
 
 \subsection{Ethical Considerations}
 The study was approved by Stockholm Research Ethics Review Board (permits 2021-02541 and 2021-03531).
 
 \section{Results}
+\begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1}
+    \caption{Demographic and Clinical Characteristics of patients screened for \acrshort{ofi}.}
+    \label{tab:tableone}
+    \scalebox{0.7}{
+        \begin{tabular}{llll}
+            \toprule
+                                                          & \textbf{Overall} & \textbf{No OFI} & \textbf{OFI}  \\
+            \midrule
+            \textbf{Age}                                  &                  &                 &               \\
+            \hspace{3mm}Mean (SD)                         & 46 (21)          & 45 (21)         & 50 (22)       \\
+            \hspace{3mm}Median [Min, Max]                 & 43 [15, 100]     & 43 [15, 100]    & 50 [15, 97]   \\
+            \hspace{3mm}Missing                           & 651 (11\%)       & 617 (11\%)      & 34 (10\%)     \\
+            \textbf{Gender}                               &                  &                 &               \\
+            \hspace{3mm}Male                              & 3509 (61\%)      & 3293 (60\%)     & 216 (64\%)    \\
+            \hspace{3mm}Female                            & 1633 (28\%)      & 1543 (28\%)     & 90 (26\%)     \\
+            \hspace{3mm}Missing                           & 651 (11\%)       & 617 (11\%)      & 34 (10\%)     \\
+            \textbf{Dead at 30 days}                      &                  &                 &               \\
+            \hspace{3mm}No                                & 4809 (83\%)      & 4523 (83\%)     & 286 (84\%)    \\
+            \hspace{3mm}Yes                               & 331 (6\%)        & 311 (6\%)       & 20 (6\%)      \\
+            \hspace{3mm}Missing                           & 653 (11\%)       & 619 (11\%)      & 34 (10\%)     \\
+            \textbf{Highest level of care}                &                  &                 &               \\
+            \hspace{3mm}Intensive care unit               & 863 (15\%)       & 761 (14\%)      & 102 (30\%)    \\
+            \hspace{3mm}General ward                      & 2002 (35\%)      & 1933 (35\%)     & 69 (20\%)     \\
+            \hspace{3mm}Surgical ward                     & 945 (16\%)       & 852 (16\%)      & 93 (27\%)     \\
+            \hspace{3mm}ED                                & 1120 (19\%)      & 1106 (20\%)     & 14 (4\%)      \\
+            \hspace{3mm}Specialist/Intermediate ward      & 212 (4\%)        & 184 (3\%)       & 28 (8\%)      \\
+            \hspace{3mm}Missing                           & 651 (11\%)       & 617 (11\%)      & 34 (10\%)     \\
+            \textbf{Injury severity score}                &                  &                 &               \\
+            \hspace{3mm}Mean (SD)                         & 10 (11)          & 10 (11)         & 18 (10)       \\
+            \hspace{3mm}Median [Min, Max]                 & 8 [0, 75]        & 5 [0, 75]       & 17 [0, 59]    \\
+            \hspace{3mm}Missing                           & 653 (11\%)       & 619 (11\%)      & 34 (10\%)     \\
+            \textbf{ED Respiratory Rate}                  &                  &                 &               \\
+            \hspace{3mm}Mean (SD)                         & 23 (20)          & 23 (20)         & 24 (21)       \\
+            \hspace{3mm}Median [Min, Max]                 & 18 [0, 99]       & 18 [0, 99]      & 18 [0, 99]    \\
+            \hspace{3mm}Missing                           & 683 (12\%)       & 644 (12\%)      & 39 (11\%)     \\
+            \textbf{ED Systolic blood pressure}           &                  &                 &               \\
+            \hspace{3mm}Mean (SD)                         & 136 (28)         & 136 (28)        & 135 (31)      \\
+            \hspace{3mm}Median [Min, Max]                 & 135 [0, 285]     & 135 [0, 285]    & 135 [0, 237]  \\
+            \hspace{3mm}Missing                           & 660 (11\%)       & 626 (11\%)      & 34 (10\%)     \\
+            \textbf{ED GCS}                               &                  &                 &               \\
+            \hspace{3mm}Mean (SD)                         & 14 (2)           & 14 (2)          & 14 (2)        \\
+            \hspace{3mm}Median [Min, Max]                 & 15 [3, 15]       & 15 [3, 15]      & 15 [3, 15]    \\
+            \hspace{3mm}Missing                           & 1008 (17\%)      & 950 (17\%)      & 58 (17\%)     \\
+            \textbf{Time to first CT}                     &                  &                 &               \\
+            \hspace{3mm}Mean (SD)                         & 75 (137)         & 74 (137)        & 82 (139)      \\
+            \hspace{3mm}Median [Min, Max]                 & 35 [0, 1415]     & 35 [0, 1415]    & 43 [6, 1339]  \\
+            \hspace{3mm}Missing                           & 1206 (21\%)      & 1147 (21\%)     & 59 (17\%)     \\
+            \textbf{Time to definitive treatment}         &                  &                 &               \\
+            \hspace{3mm}Mean (SD)                         & 263 (354)        & 260 (358)       & 278 (328)     \\
+            \hspace{3mm}Median [Min, Max]                 & 110 [0, 2036]    & 104 [0, 2036]   & 154 [9, 1420] \\
+            \hspace{3mm}Missing                           & 4635 (80\%)      & 4453 (82\%)     & 182 (54\%)    \\
+            \textbf{Intubated}                            &                  &                 &               \\
+            \hspace{3mm}No                                & 5285 (91\%)      & 4997 (92\%)     & 288 (85\%)    \\
+            \hspace{3mm}Yes                               & 508 (9\%)        & 456 (8\%)       & 52 (15\%)     \\
+            \hspace{3mm}Missing                           & 0 (0\%)          & 0 (0\%)         & 0 (0\%)       \\
+            \textbf{Emergency procedure}                  &                  &                 &               \\
+            \hspace{3mm}Laparotomy                        & 114 (2\%)        & 100 (2\%)       & 14 (4\%)      \\
+            \hspace{3mm}Craniotomy                        & 131 (2\%)        & 111 (2\%)       & 20 (6\%)      \\
+            \hspace{3mm}Other                             & 787 (14\%)       & 699 (13\%)      & 88 (26\%)     \\
+            \hspace{3mm}Radiological intervention         & 51 (1\%)         & 29 (1\%)        & 22 (6\%)      \\
+            \hspace{3mm}Thoracotomy                       & 18 (0\%)         & 17 (0\%)        & 1 (0\%)       \\
+            \hspace{3mm}Intracranial pressure measurement & 34 (1\%)         & 28 (1\%)        & 6 (2\%)       \\
+            \hspace{3mm}Revascularisation                 & 22 (0\%)         & 15 (0\%)        & 7 (2\%)       \\
+            \hspace{3mm}Pelvis packing                    & 2 (0\%)          & 2 (0\%)         & 0 (0\%)       \\
+            \hspace{3mm}Missing                           & 4634 (80\%)      & 4452 (82\%)     & 182 (54\%)    \\
+            \bottomrule
+        \end{tabular}
+    }
+    \caption*{\scriptsize Time to first CT and Time to definitive treatment are measured in minutes from arrival at the hospital.\\
+        \textit{Definition of abbreviations:} OFI = Opportunity for Improvement; ED = Emergency Department; GCS = Glascow Coma Scale.}
+\end{table}
 
 \section{Discussion}
 
