@@ -230,14 +230,14 @@ A pre-processor was developed to be able to pre-process both the training and te
 As suggested by Attegrim and Szolnoky et al. the following models were traditional methods were implemented with scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, decision tree, support vector machine, k-nearest neighbour. The following boosting methods were implemented using the provided Python implementation: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was run all models, using the first resamples training data, and their suggested parameters (found either by the source documentation or implementation documentation) for a total of 1 hour each.
 
 \subsubsection*{Synthesising models}
-The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} model proposed by Xu et al. was implemented with the help of the Synthetic Data Vault framework \cite{patki_sdv_2016} available in Python. The batch size was increased to 1000 samples to include more minority cases in a single batch. Otherwise the standard parameters provided were used. Synthesising models were trained on each resamples training data. The synthesising models output an equally large dataset as the training input.
+The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} model proposed by Xu et al. was implemented with the help of the Synthetic Data Vault framework \cite{patki_sdv_2016} available in Python. The batch size was increased to 1000 samples to include more minority cases in a single batch. Otherwise the standard parameters provided were used.
 
 \subsection{Statistical Analysis}
 The performance of the models was measured using and compared using \acrfull{auc}. The performance was compared by calculating the \acrshort{auc} value on the test split, additionally the \acrshort{auc} delta to each other model was calculated.
 
 All statistical analyses were done using Python. The analyses were run on an 80\%-20\% train-test split 100 times using random resampling without replacement. The estimated 95\% \acrfull{ci} using $t$-distribution was calculated for \acrshort{auc} as well as the delta values using all resamples.
 
-The classification models were trained on either the raw resample's training data, the synthesising models output, or a combination of both. For each training cycle the classification models were trained on the raw test data from the train-test split.
+Synthesising models were trained on each resamples raw training data. The synthesising models output an equally large dataset as the training input. The classification models were trained on either the pre-processed resample's training data, the pre-processed synthesising models output, or a combination of both. For each training cycle the classification models were tested on the pre-processed test data from the train-test split.
 
 \subsection{Ethical Considerations}
 The study was approved by Stockholm Research Ethics Review Board (permits 2021-02541 and 2021-03531).
