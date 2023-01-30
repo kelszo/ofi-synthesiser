@@ -1,8 +1,17 @@
 \documentclass[12pt, letterpaper]{article}
 \usepackage[english]{babel}
 
+% margins
+\usepackage[a4paper, margin=2.5cm]{geometry}
+
 % include pdf
 \usepackage[final]{pdfpages}
+
+% fix line breaks urls
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{longtable}
 
 % quotes
 \usepackage{csquotes}
@@ -15,6 +24,44 @@
 
 % Double spacing
 \usepackage{setspace}
+
+% appendix
+\usepackage[page, title]{appendix}
+
+% tables
+\usepackage{booktabs}
+\usepackage{array} % centering + width fix
+
+\usepackage{caption} 
+\captionsetup{labelfont=bf,labelsep=period}
+\usepackage{cleveref}
+
+% Fix section titles size/format
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\fontsize{16}{21}\bfseries}
+  {\thesection}
+  {1em}
+  {}
+
+\titleformat{\subsection}
+  {\normalfont\fontsize{14}{18}\bfseries}
+  {\thesubsection}
+  {1em}
+  {}
+
+  \titleformat{\subsubsection}
+  {\normalfont\fontsize{12}{14}\itshape}
+  {\thesubsubsection}
+  {1em}
+  {}
+
+\titlespacing{\section}{0pt}{\parskip}{-\parskip}
+\titlespacing{\subsection}{0pt}{0.75\parskip}{-\parskip}
+\titlespacing{\subsubsection}{0pt}{0.5\parskip}{-\parskip}
+
+% Remove section numbers
+\setcounter{secnumdepth}{0}
 
 % Set paragraph spacing
 \setlength{\parindent}{0pt}
@@ -34,6 +81,12 @@
 \newacronym{ofi}{OFI}{opportunity for improvement}
 \newacronym{qi}{QI}{quality improvement}
 \newacronym{gan}{GAN}{generative adversarial network}
+\newacronym{iss}{ISS}{injury severity score}
+\newacronym{swetrau}{SweTrau}{Swedish Trauma Registry}
+\newacronym{ci}{CI}{confidence interval}
+\newacronym{ctgan}{CTGAN}{conditional tabular generative adversarial network}
+\newacronym{tvae}{TVAE}{triplet based variational autoencoder}
+\newacronym{vae}{VAE}{variational variable autoencoder}
 
 \newglossaryentry{trauma}
 {
@@ -46,7 +99,7 @@
 {
     name={OFI},
     text={OFI},
-    description={Also known as opportunity for improvement}
+    description={Short for opportunity for improvement, is a consensus reached at a morbidity and mortality conference regarding whether there exists opportunity for improvement in the handling of a singular patient trauma care.}
 }
 
 
@@ -106,7 +159,7 @@
 \newpage
 \pagenumbering{arabic}
 
-\doublespacing
+\setstretch{1.5}
 
 \section{Introduction}
 \Gls{trauma} is a major contributor to death and illness for individuals between the ages of 10 and 49 worldwide, and the leading cause of death amongst young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The \gls{trauma} population has a low average age and two-thirds of the group have no history of co-morbidity \cite{brattstrom_socio-economic_2015}. Thus it is essential to ensure a constant high-quality \gls{trauma} care to lower mortality and morbidity for this population with long a age expectancy.
@@ -115,7 +168,7 @@ A method of improving trauma patient care is to implement \acrfull{qi} programme
 
 An \acrshort{ofi} is a concrete deficiencies in patient care and are often occur in initial care, such as, airway management, fluid resuscitation, haemorrhage control, and chest injury management \cite{world_health_organization_guidelines_2009,roy_learning_2017,oreilly_opportunities_2013,sanddal_analysis_2011}.
 
-A more advanced \acrshort{qi} technique suggested by WHO is the application of audit filters that use electronic health record systems to monitor predefined variables to flag cases with \acrfull{ofi} \cite{world_health_organization_guidelines_2009}. Filtering cases using an audit filter before reviewing by an \acrshort{mam} conference provides a possibility to reduce false positive cases and thus reducing the costs of the \acrshort{qi} programme as a whole.
+A more advanced \acrshort{qi} technique suggested by WHO is the application of audit filters that use electronic health record systems to monitor predefined variables to flag patient cases with \acrfull{ofi} \cite{world_health_organization_guidelines_2009}. Filtering cases using an audit filter before reviewing by an \acrshort{mam} conference provides a possibility to reduce false positive cases and thus reducing the costs of the \acrshort{qi} programme as a whole.
 
 However, the performance of such systems varies and have been associated with high frequencies of false positives. Depending on context the frequency of false positives can range from 24\% to 80\% \cite{attergrim_predicting_2023,sanddal_analysis_2011,roy_learning_2017,ghorbani_analysis_2018}.
 
@@ -126,15 +179,22 @@ Despite this performance boost, the models' still suffer from that 50\% of patie
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/gan-xray.png}
-    \caption{Example of using a \acrfull{gan} to generate chest radiograph images. Image taken from \cite{}.}
+    \caption{Example of using a \acrfull{gan} to generate chest radiograph images. Image taken from \cite{sundaram_gan-based_2021}.}
     \label{fig:gan-xray}
 \end{figure}
 
-Recently however, using \acrfullpl{gan} to generate synthetic data has become a hot topic in image analysis \cite{}. A \acrshort{gan} is a type of artificial neural network. \acrshortpl{gan} internally use two neural networks, one network to generate data (the generator) and another that tells how realistic the data is compared to the ground truth data (the descriminator). During the training of \acrshortpl{gan}, the two internal models constantly compete; the generator model generating data that the descriminator can't tell apart from the ground truth data. \cite{}. \acrshortpl{gan} can be seen as a sort of evolutionary arms race between the two internal models, similar to the evolutionary process known as mimicry. In short,by training a \acrshort{gan} on true manually annotated data one can there after produce more data.
+Recently however, using \acrfullpl{gan} to generate synthetic data has become a hot topic in image analysis \cite{}. See \Cref{fig:gan-xray} for an example usage of \acrshortpl{gan} in image analysis. A \acrshort{gan} is a type of artificial neural network. It consists of two main parts: a generator and a discriminator. The generator is trained to produce new data samples that are similar to the input data, while the discriminator is trained to distinguish between the generated samples and the real data. The generator and discriminator are trained together, in an adversarial manner: the generator tries to produce samples that the discriminator cannot correctly identify as fake, while the discriminator tries to correctly identify the fake samples produced by the generator. Through this process, the generator learns to produce samples that are similar to the input data, and the discriminator learns to recognize the differences between the real and generated data. Thus the two generator constantly evolves to be able to produce data more closely to the source that the discriminator cannot differentiate as synthetic data.
+
+
+%\acrshortpl{gan} internally use two neural networks, one network to generate data (the generator) and another that tells how realistic the data is compared to the ground truth data (the discriminator). During the training of \acrshortpl{gan}, the two internal models constantly compete; the generator model generating data that the discriminator can't tell apart from the ground truth data \cite{}. \acrshortpl{gan} can be seen as a sort of evolutionary arms race between the two internal models, similar to the evolutionary process known as mimicry. In short,by training a \acrshort{gan} on true manually annotated data one can there after produce more data.
+
+Another form of artificial neural network generative models are the \acrfull{vae} \cite{}. It is a simpler and more compact model that works by
+learning the probabilistic representation of a dataset, called the latent space. The latent space can simply be described as a compressed representation of the input data that captures the most important features and variations in the data. The \acrshort{vae} consists of two main parts: an encoder and a decoder. The encoder takes in the input data and maps it to a probability distribution in the latent space, while the decoder takes a sample from this distribution and maps it back to the original data space. By training the \acrshort{vae}, we can learn a compact representation of the input data that captures the most important features and variations in the dataset.
+
 
 The quality of the generated data often varies and depends on several factors, such as, the quality and amount of ground truth data \cite{}. The major benefit of having a method for generating quality synthetic data is the possibility of expanding small datasets and training \acrshort{ml} models where it was not previously possible or did not achieve adequate results due to data amount.
 
-In addition to generating more trainable data, most \acrshortpl{gan} are able to anonymise data \cite{}. Thus providing an interface for being able to generate synthetic datasets of sensitive personal information that are completely anonymous. These synthetic datasets can, in theory, be distributed and increase the availability of medical datasets for researchers.
+In addition to generating more trainable data, some \acrshortpl{gan} are able to anonymise data \cite{}. Thus providing an interface for being able to generate synthetic datasets of sensitive personal information that are completely anonymous. These synthetic datasets can, in theory, be distributed and increase the availability of medical datasets for researchers.
 
 \subsection{Aim}
 Hitherto, using \acrshortpl{gan} is rare and relatively unexplored for structured tabular data. Few articles exist investigating the feasibility of generating synthetic tabular data in a medical context.
@@ -142,20 +202,44 @@ Hitherto, using \acrshortpl{gan} is rare and relatively unexplored for structure
 Therefore, the aim of this article is to evaluate the effectiveness of using \acrshortpl{gan} for generating synthetic tabular data in a trauma setting, and to investigate the potential of this approach for improving \acrshort{ofi} prediction models.
 
 \section{Materials and Methods}
-We conducted a registry-based study using all trauma patients included in Karolinska University Hospital trauma registry and trauma care quality database between 2014 and 2021 to compare the performance of supervised \acrshort{ml} models trained with and without synthetic data.
+We conducted a retrospective study using registry data from Karolinska University Hospital, comparing the performance of supervised machine learning models that were trained with synthetic data and those that were not, by analysing all trauma patients in the trauma registry and quality database from 2014 to 2021.
+
+The code used in this study is available online at \url{https://codeberg.org/kelszo/ofi-synthesiser} under the \textit{GNU Affero General Public License v3.0} license.
 
 \subsection{Study Population and Setting}
+Karolinska University Hospital in Solna, Sweden manages approximately 1500 acute trauma patients per year making it equivalent to a level 1 trauma center. The hospital reports all patients admitted with an \acrfull{iss} score more than 9, as well as, all patients admitted with trauma team activation regardless of \acrshort{iss} score to the \acrfull{swetrau} \cite{swetrau}. \acrshort{swetrau} inlcudes data on patient parameters, such as, blood pressure, heart rate, and respiratory rate, as well, injuries, interventions, and various checkpoint times. The registry is compliant with the european consensus statement, also known as the utstein template \cite{ringdal_utstein_2008}.
+
+Parallel with this registry Karolinska University Hospital maintains an internal \acrshort{qi} registry known here as the quality database. The quality database includes data relating to the \acrshort{qi} program and \acrshort{mam} conferences, such as, audit filter results, identified \acrshortpl{ofi} and their recommended corrective actions. For all currently used audit filters at Karolinska University Hospital see \Cref{tab:auditfilters} in the appendix.
+
+The Karolinska University Hospital conducts multidisciplinary conferences to review the outcomes of trauma patients, involving all healthcare professionals involved in their initial care, this includes surgery, anaesthesia, orthopaedics, intensive care, radiology, and nursing. \acrshort{ofi} are identified through a consensus decision, and appropriate corrective actions are suggested. Mortality cases immediately escalated to the mortality conference while morbidity cases includes escalating levels of reviews. Mortality conferences conclude whether a patient mortality was preventable or possibly preventable. The review process for morbidity cases was improved and formalized during the study period, with audit filters applied to the trauma quality database and individual reviews by specialised nurses were added in 2017. Between years 2014 and 2017, a specialised trauma nurse selectively reviewed trauma patients to identify possible \acrshortpl{ofi} to escalate to a \acrshort{mam} conference. Following 2017, a specialised nurse registered data to the trauma registry while at the same time looking for possible audit filter violations (including a possible manual violation flag) and applying them to the trauma quality database. If a violation was detected, the patient was reviewed again by two specialised nurses. If the second review could not exclude a possible \acrshort{ofi} the patient case was finally escalated to a morbidity conference for a final verdict.
+
+All patients screened for \acrshort{ofi} between 2014 and 2021 were included. Patients under the age of 15 were excluded due to differing clinical pathway.
 
 \subsection{Predictor Variables}
+All variables included in the trauma registry and the revised Utstein template were used as predictors for both \acrshort{ofi} classification and data synthesising \acrshort{ml} models. The predictors included both categorical and continuos values, including but not limited to, blood pressure, interventions, injury mechanisms and intentions, care length and level, and time points. The trauma registry includes data for the whole patient care, including pre-hospital setting and treatment, in-hospital care, and outcome in the form of Glasgow Outcome Scale and mortality. For a complete list of predictors, and their respective definitions, see the revised Utstein template \cite{ringdal_utstein_2008} or \Cref{tab:predictors} in the appendix.
 
 \subsection{Outcome variable}
+The outcome was defined as the verdict from the \acrshort{mam} conference with the binary levels of "Yes - At least one \acrshort{ofi} identified" or "No - No \acrshort{ofi} identified". Preventable or possible preventable deaths were considered as an \acrshort{ofi}.
 
-\subsection{Model Development}
+\subsection{Model Development and Data preprocessing}
+All model development and data preprocessing was performed in Python. The model development can be separated in the development of the classification and synthesising models. For more specifics regarding implementation specifics, versions, and packages see the project source code.
 
-\subsection{Statistics Analysis}
+\subsubsection*{Data preprocessing}
+A pre-processor was developed to be able to pre-process both the training and test data without any leakage. This was done by rescaling continuous features using Yeo-Johnson's power transformation \cite{yeo_new_2000} and encoding nominal features using one-hot encoding. Ordinal features were left unchanged. Continuous features were imputed by using the mean of the feature, ordinal by using the most frequent value, and nominal by adding an "unknown" category. An exception was made for both the pre-hospital and emergency department blood pressure and respiratory rate, they were imputed by using the mean value of the revised trauma score category, if it existed. The pre-processor was trained and applied on the training data to be there after only applied to the test data, thus no data leakage occurred between the test and training set.
+
+\subsubsection*{Classification models}
+As suggested by Attegrim and Szolnoky et al. the following models were traditional methods were implemented with scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, decision tree, support vector machine, k-nearest neighbour. The following boosting methods were implemented using the provided Python implementation: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}.
+
+\subsubsection*{Synthesising models}
+The \acrfull{ctgan} and \acrfull{tvae} model proposed by Xu et al. was implemented with the help of the Synthetic Data Vault framework available in Python \cite{xu_advances_2019, patki_sdv_2016}.
+
+\subsection{Statistical Analysis}
+The performance of the models was measured using and compared using \acrfull{auc}. The performance was compared by calculating the \acrshort{auc} value on the test split, additionally the \acrshort{auc} delta to each other model was calculated.
+
+All statistical analyses were done using Python. The analyses were run on an 80\%-20\% train-test split 100 times using random resampling without replacement. The estimated 95\% \acrfull{ci} using $t$-distribution was calculated for \acrshort{auc} as well as the delta values using all resamples.
 
 \subsection{Ethical Considerations}
-The study was approved by Stockholm Research Ethics Review Board, approval number 2021-02541 and 2021-03531.
+The study was approved by Stockholm Research Ethics Review Board (permits 2021-02541 and 2021-03531).
 
 \section{Results}
 
@@ -167,8 +251,109 @@ The study was approved by Stockholm Research Ethics Review Board, approval numbe
 
 \section*{Acknowledgement}
 
+\newpage
+
 \singlespacing
 
 \printbibliography
+
+\newpage
+
+\begin{appendices}
+    \setcounter{table}{0}
+    \renewcommand{\thetable}{A\arabic{table}}
+
+    \setcounter{figure}{0}
+    \renewcommand{\thefigure}{A\arabic{figure}}
+
+    \setcounter{secnumdepth}{1}
+
+    \section{Tables}
+    \begin{table}[h]
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+
+        \caption{All the currently used audit filters at Karolinska University Hospital.}
+        \label{tab:auditfilters}
+
+        \begin{tabular}{@{}|p{0.85\linewidth}|@{}}
+            \hline
+            \multicolumn{1}{|c|}{\textbf{Audit filter}}                                                \\\hline
+            Systolic blood pressure less than 90                                                       \\\hline
+            Glasgow coma scale less than 9 and not intubated                                           \\\hline
+            Injury severity score greater than 15 but not admitted to the intensive care unit          \\\hline
+            Time to acute intervention more than 60 minutes from arrival to hospital                   \\\hline
+            Time to computed tomography more than 30 minutes from arrival to hospital                  \\\hline
+            No anticoagulant therapy within 72 hours after traumatic brain injury                      \\\hline
+            The presence of cardio-pulmonary resuscitation with thoracotomy                            \\\hline
+            The presence of a liver or spleen injury                                                   \\\hline
+            Massive transfusion, defined as 10 or more units of packed red blood cells within 24 hours \\\hline
+            Other non-defined reason found by first reviewing nurse                                    \\\hline
+        \end{tabular}
+    \end{table}
+
+
+    \renewcommand*{\arraystretch}{1.2}
+    \begin{longtable}[c]{@{}|l|p{0.55\linewidth}|@{}}
+        \caption{Predictors used in the development of the \acrlong{ofi} classification and synthesising models. \textit{Definition of abbreviations:} CT = Computer Tomography; DT = Delta Time; ED = Emergency department; GCS = Glascow Coma Scale; PH = Pre-hospital.}%
+        \label{tab:predictors}                                                                                          \\
+        \hline
+        \multicolumn{1}{|c|}{\textbf{SweTrau code}} & \multicolumn{1}{|c|}{\textbf{Description}}                        \\\hline
+        \endfirsthead
+        %
+        \endhead
+        %
+        AlarmRePrioritised                          & Reprioritisation of trauma code                                   \\\hline
+        FirstTraumaDT\_NotDone                      & Trauma CT not done                                                \\\hline
+        ISS                                         & Injury Severity Score                                             \\\hline
+        NumberOfActions                             & Number of Actions done                                            \\\hline
+        NumberOfInjuries                            & Number of injuries                                                \\\hline
+        TraumaAlarmAtHospital                       & Type of trauma code criteria                                      \\\hline
+        TraumaAlarmCriteria                         & Trauma code at hospital                                           \\\hline
+        dt\_alarm\_hosp                             & DT alarm to ED                                                    \\\hline
+        dt\_alarm\_scene                            & DT alarm to arrival at scene                                      \\\hline
+        dt\_ed\_emerg\_proc                         & DT arrival at ED to emergency procedure                           \\\hline
+        dt\_ed\_first\_ct                           & DT arrival at ED to first CT                                      \\\hline
+        dt\_ed\_norm\_be                            & DT arrival ED to normalised base excess                           \\\hline
+        ed\_be\_art                                 & First base excess at the ED                                       \\\hline
+        ed\_be\_art\_NotDone                        & Base excess not taken at ED                                       \\\hline
+        ed\_emerg\_proc                             & Emergency procedure at ED                                         \\\hline
+        ed\_emerg\_proc\_other                      & Other emergency procedure at ED                                   \\\hline
+        ed\_gcs\_motor                              & Motor response according to GCS at ED                             \\\hline
+        ed\_gcs\_sum                                & GCS score at ED                                                   \\\hline
+        ed\_inr                                     & First Prothrombin time (international normalize ratio)            \\\hline
+        ed\_inr\_NotDone                            & Prothrombin time (international normalized ratio) not taken at ED \\\hline
+        ed\_intub\_type                             & Intubation type at ED                                             \\\hline
+        ed\_intubated                               & Was intubated at ED                                               \\\hline
+        ed\_rr\_value                               & Respiratory rate at ED                                            \\\hline
+        ed\_sbp\_value                              & Systolic blood pressure at ED                                     \\\hline
+        ed\_tta                                     & Trauma team activated                                             \\\hline
+        hosp\_dischg\_dest                          & Discharge destination                                             \\\hline
+        hosp\_los\_days                             & Total admittance days at hospital                                 \\\hline
+        hosp\_vent\_days                            & Total amount of days in a ventilator                              \\\hline
+        host\_care\_level                           & Highest level of care                                             \\\hline
+        host\_transfered                            & Transferred from/to another hospital                              \\\hline
+        host\_vent\_days\_NotDone                   & No days spent on a ventilator                                     \\\hline
+        inj\_dominant                               & Dominant type of injury                                           \\\hline
+        inj\_intention                              & Injury intention                                                  \\\hline
+        inj\_mechanism                              & Dominant injury mechanism                                         \\\hline
+        iva\_dagar\_n                               & Total amount of days in the intensive care unit                   \\\hline
+        iva\_vardtillfallen\_n                      & Amount of times admitted to the intensive care unit               \\\hline
+        pre\_card\_arrest                           & PH cardiac arrest                                                 \\\hline
+        pre\_gcs\_motor                             & PH motor response according to GCS                                \\\hline
+        pre\_gcs\_sum                               & PH GCS score                                                      \\\hline
+        pre\_intub\_type                            & Type of intubation PH                                             \\\hline
+        pre\_intubated                              & Was intubated PH                                                  \\\hline
+        pre\_provided                               & Level of care given PH                                            \\\hline
+        pre\_rr\_value                              & PH Respiratory rate                                               \\\hline
+        pre\_sbp\_value                             & PH Systolic blood pressure                                        \\\hline
+        pre\_transport                              & Transport type PH                                                 \\\hline
+        pt\_Gender                                  & Gender                                                            \\\hline
+        pt\_age\_yrs                                & Patient age                                                       \\\hline
+        pt\_asa\_preinjury                          & American Society of Anesthesiologists Class pre-injury            \\\hline
+        res\_gos\_dischg                            & Glascow outcome score at discharge                                \\\hline
+        res\_survival                               & Mortality                                                         \\\hline
+    \end{longtable}
+\end{appendices}
 
 \end{document}

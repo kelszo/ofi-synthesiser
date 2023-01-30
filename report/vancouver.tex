@@ -94,6 +94,22 @@
             \printfield{urlday}]
 }
 
+\DeclareBibliographyDriver{online}{%
+    \printnames{author}%
+    \setunit*{\addperiod\space}%
+    \printfield{title} [Internet]%
+    \setunit*{\addperiod\space}%
+    \printlist{location}%
+    \setunit*{\addcolon\space}% 
+    \printnames{author}%
+    \setunit*{\addsemicolon\space}%
+    \printfield{year}%
+    \setunit*{ - .}%
+    \printurldate{}%
+    \setunit*{\addperiod\space}%
+    \printfield{url}%
+    \finentry}
+
 \DeclareBibliographyDriver{database}{%
     \printfield{title} [Internet]%
     \setunit*{\addperiod\space}%
