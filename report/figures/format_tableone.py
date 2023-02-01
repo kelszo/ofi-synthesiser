@@ -1,35 +1,56 @@
 import pandas as pd
 
-def mean_scalar(data: pd.Series, scalar_name: str, group = None) -> str:
+
+def mean_scalar(data: pd.Series, scalar_name: str, group=None) -> str:
     mean = round(data.mean())
     std = round(data.std())
 
-
     return f"{mean} ({std})"
 
-def median_scalar(data: pd.Series, scalar_name: str, group = None) -> str:
+
+def median_scalar(data: pd.Series, scalar_name: str, group=None) -> str:
     median = round(data.median())
     min_value = round(data.min())
     max_value = round(data.max())
 
     return f"{median} [{min_value}, {max_value}]"
 
-def format_category(data: pd.Series, category_name: str, group = None) -> str:
+
+def format_category(data: pd.Series, category_name: str, group=None) -> str:
     n = data.sum()
-    p = round((n / len(data))*100)
+    p = (n / len(data)) * 100
+
+    if p > 0 and p < 1:
+        p = "\\textless1"
+    else:
+        p = round(p)
 
     return f"{n} ({p}\\%)"
 
-def format_missing(data: pd.Series, category_name: str, group = None) -> str:
+
+def format_missing(data: pd.Series, category_name: str, group=None) -> str:
     n = data.isna().sum()
-    p = round((n / len(data)* 100))
+    p = n / len(data) * 100
+
+    if p > 0 and p < 1:
+        p = "\\textless1"
+    else:
+        p = round(p)
 
     return f"{n} ({p}\\%)"
 
-def format_tableone(data: pd.DataFrame, groupby:str, missing = True) -> str:
+
+def format_tableone(data: pd.DataFrame, groupby: str, missing=True) -> str:
     groupby_values = data[groupby].unique()
 
-    table1_dict = {x:[] for x in ["","Overall", *data["ofi"].unique()]}
+    table1_dict = {x: [] for x in ["", "Overall", *data["ofi"].unique()]}
+
+    table1_dict[""].append("")
+
+    table1_dict["Overall"].append(f"$n={len(data)}$")
+
+    for groupby_value in groupby_values:
+        table1_dict[groupby_value].append(f"$n={len(data.loc[data[groupby] == groupby_value])}$")
 
     for column in data.columns:
         if column == groupby:
@@ -47,20 +68,26 @@ def format_tableone(data: pd.DataFrame, groupby:str, missing = True) -> str:
             table1_dict[""].append("\hspace{3mm}Mean (SD)")
             table1_dict["Overall"].append(mean_scalar(data[column], column))
             for groupby_value in groupby_values:
-                table1_dict[groupby_value].append(mean_scalar(data.loc[data[groupby] == groupby_value][column], column, group=groupby_value))
+                table1_dict[groupby_value].append(
+                    mean_scalar(data.loc[data[groupby] == groupby_value][column], column, group=groupby_value)
+                )
 
             table1_dict[""].append("\hspace{3mm}Median [Min, Max]")
             table1_dict["Overall"].append(median_scalar(data[column], column))
             for groupby_value in groupby_values:
-                table1_dict[groupby_value].append(median_scalar(data.loc[data[groupby] == groupby_value][column], column, group=groupby_value))
+                table1_dict[groupby_value].append(
+                    median_scalar(data.loc[data[groupby] == groupby_value][column], column, group=groupby_value)
+                )
 
             if missing:
                 table1_dict[""].append("\hspace{3mm}Missing")
 
                 table1_dict["Overall"].append(format_missing(data[column], column))
-                
+
                 for groupby_value in groupby_values:
-                    table1_dict[groupby_value].append(format_missing(data.loc[data[groupby] == groupby_value][column], column, group=groupby_value))
+                    table1_dict[groupby_value].append(
+                        format_missing(data.loc[data[groupby] == groupby_value][column], column, group=groupby_value)
+                    )
 
         elif column_dtype == "category":
             table1_dict[""].append("\\textbf{" + column + "}")
@@ -70,20 +97,24 @@ def format_tableone(data: pd.DataFrame, groupby:str, missing = True) -> str:
 
             for category in data[column].dropna().unique():
                 table1_dict[""].append("\hspace{3mm}" + str(category))
-                
+
                 table1_dict["Overall"].append(format_category(data[column] == category, column))
 
                 for groupby_value in groupby_values:
-                    table1_dict[groupby_value].append(format_category(data.loc[data[groupby] == groupby_value][column] == category, column, group=groupby_value))
-            
+                    table1_dict[groupby_value].append(
+                        format_category(
+                            data.loc[data[groupby] == groupby_value][column] == category, column, group=groupby_value
+                        )
+                    )
+
             if missing:
                 table1_dict[""].append("\hspace{3mm}Missing")
 
                 table1_dict["Overall"].append(format_missing(data[column], column))
-                
-                for groupby_value in groupby_values:
-                    table1_dict[groupby_value].append(format_missing(data.loc[data[groupby] == groupby_value][column], column, group=groupby_value))
-            
 
+                for groupby_value in groupby_values:
+                    table1_dict[groupby_value].append(
+                        format_missing(data.loc[data[groupby] == groupby_value][column], column, group=groupby_value)
+                    )
 
     return pd.DataFrame(table1_dict)

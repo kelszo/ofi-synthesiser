@@ -1,0 +1,43 @@
+// Flowchart
+digraph {
+	graph [layout=dot nodesep=0.6 splines=ortho]
+	node [fontsize=12 shape=box width=2.75]
+	edge [arrowhead=vee arrowsize=0.7 labelfontsize=11]
+	swetrau [label="Trauma Registry (n=12107)"]
+	{
+		rank=same
+		excluded [label=<
+Excluded (n=6314)<br ALIGN='LEFT'/>
+&#8226; Not screened for OFI (n=6314)<br ALIGN='LEFT'/>
+&#8226; Under the age of 15 (n=0)<br ALIGN='LEFT'/>
+>]
+		1 [height=0 shape=point width=0]
+		1 -> excluded [minlen=2]
+	}
+	swetrau -> 1 [arrowhead=none]
+	1 -> eligible
+	alive [label="Survival* (n=5462)"]
+	death [label="Death* (n=331)"]
+	eligible [label="Eligible (n=5793)"]
+	af [label="Flagged By Audit filter (n=3668)"]
+	nurse [label="Flagged by nurse (n=41)"]
+	review [label="Review by two nurses (n=3709)"]
+	mbc [label="Morbidity conference (n=?)"]
+	mtc [label="Mortality conference (n=331)"]
+	ofi [label="OFI (n=340)"]
+	nofi [label="No OFI (n=5453)"]
+	eligible -> alive
+	alive -> af
+	af -> review
+	eligible -> death
+	death -> mtc
+	alive -> nurse
+	nurse -> review
+	review -> nofi
+	alive -> nofi
+	review -> mbc
+	mtc -> ofi
+	mtc -> nofi
+	mbc -> ofi
+	mbc -> nofi
+}

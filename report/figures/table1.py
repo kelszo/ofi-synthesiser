@@ -22,28 +22,56 @@ data["pt_Gender"] = data["pt_Gender"].replace({1: "Male", 2: "Female"})
 
 data["res_survival"] = data["res_survival"].replace({1: "Yes", 2: "No"})
 
-data["host_care_level"] = data["host_care_level"].replace({1: "ED", 2: "General ward", 3: "Surgical ward", 4: "Specialist/Intermediate ward", 5:"Intensive care unit"})
+data["host_care_level"] = data["host_care_level"].replace(
+    {1: "ED", 2: "General ward", 3: "Surgical ward", 4: "Specialist/Intermediate ward", 5: "Intensive care unit"}
+)
 
-data["ed_emerg_proc"] = data["ed_emerg_proc"].replace({1: "Thoracotomy", 2: "Laparotomy", 3: "Pelvis packing", 4: "Revascularisation", 5:"Radiological intervention", 6:"Craniotomy", 7:"Intracranial pressure measurement", 8:"Other"})
+data["ed_emerg_proc"] = data["ed_emerg_proc"].replace(
+    {
+        1: "Thoracotomy",
+        2: "Laparotomy",
+        3: "Pelvis packing",
+        4: "Revascularisation",
+        5: "Radiological intervention",
+        6: "Craniotomy",
+        7: "Intracranial pressure measurement",
+        8: "Other",
+    }
+)
 
 data["ofi"] = data["ofi"].replace({"Yes": "OFI", "No": "No OFI"})
 
-columns = ["pt_age_yrs", "pt_Gender", "res_survival", "host_care_level", "ISS", "ed_rr_value", "ed_sbp_value", "ed_gcs_sum", "dt_ed_first_ct", "dt_ed_emerg_proc", "intubated", "ed_emerg_proc", "ofi"]
+columns = [
+    "pt_age_yrs",
+    "pt_Gender",
+    "res_survival",
+    "host_care_level",
+    "ISS",
+    "ed_rr_value",
+    "ed_sbp_value",
+    "ed_gcs_sum",
+    "dt_ed_first_ct",
+    "dt_ed_emerg_proc",
+    "intubated",
+    "ed_emerg_proc",
+    "ofi",
+]
 
-categorical = ["pt_Gender","res_survival", "host_care_level", "intubated","ed_emerg_proc", "ofi"]
+categorical = ["pt_Gender", "res_survival", "host_care_level", "intubated", "ed_emerg_proc", "ofi"]
 
-rename={'pt_age_yrs': 'Age',
-"pt_Gender": "Gender",
-"res_survival": "Dead at 30 days",
-"host_care_level": "Highest level of care",
-"ISS":"Injury severity score",
-"ed_rr_value":"ED Respiratory Rate",
-"ed_gcs_sum":"ED GCS",
-"ed_sbp_value":"ED Systolic blood pressure",
-"dt_ed_first_ct":"Time to first CT",
-"dt_ed_emerg_proc":"Time to definitive treatment",
-"intubated":"Intubated",
-"ed_emerg_proc":"Emergency procedure",
+rename = {
+    "pt_age_yrs": "Age",
+    "pt_Gender": "Gender",
+    "res_survival": "Dead at 30 days",
+    "host_care_level": "Highest level of care",
+    "ISS": "Injury severity score",
+    "ed_rr_value": "ED Respiratory Rate",
+    "ed_gcs_sum": "ED GCS",
+    "ed_sbp_value": "ED Systolic blood pressure",
+    "dt_ed_first_ct": "Time to first CT",
+    "dt_ed_emerg_proc": "Time to definitive treatment",
+    "intubated": "Intubated",
+    "ed_emerg_proc": "Emergency procedure",
 }
 
 reverse_rename = {v: k for k, v in rename.items()}
