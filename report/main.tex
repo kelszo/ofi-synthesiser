@@ -106,7 +106,7 @@
 {
     name=Trauma,
     text=trauma,
-    description={Damage inflicted on the body as the direct or indirect result of an external force, with or without disruption of structural continuity.}
+    description={The clinical entity composed by physical injury and the body's associated response \cite{gerdin_risk_2015}.} 
 }
 
 \newglossaryentry{gofi}
@@ -176,9 +176,7 @@
 \setstretch{1.5}
 
 \section{Introduction}
-\Gls{trauma} is a major contributor to death and illness
-%% Consider mortality and morbidity instead of death and illness
-for individuals between the ages of 10 and 49 worldwide, and the leading cause of death amongst young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The \gls{trauma} population has a low average age and two-thirds of the group have no history of co-morbidity \cite{brattstrom_socio-economic_2015}. Thus it is essential to ensure high-quality \gls{trauma} care to lower mortality and morbidity for this population with long a age expectancy.
+\Gls{trauma} is a major contributor to mortality and morbidity for individuals between the ages of 10 and 49 worldwide, and the leading cause of death amongst young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The \gls{trauma} population has a low average age and two-thirds of the group have no history of co-morbidity \cite{brattstrom_socio-economic_2015}. Thus it is essential to ensure high-quality \gls{trauma} care to lower mortality and morbidity for this population with long a age expectancy.
 
 One method of improving trauma patient care is \acrfull{qi} programmes, as suggested by the World Health Organization (WHO) \cite{world_health_organization_guidelines_2009}. \Acrfull{mam} conferences are a cornerstone in such programmes and aim to identify \acrfull{ofi} in patient care \cite{santana_development_2014}. \acrshort{mam} conferences are conducted by representatives from all disciplines and professions involved in trauma care. During these conferences the treatment provided for an individual patient is discussed and compared against the optimal treatment that should have been provided. Regularly performing such reviews are associated with reducing complication frequencies, hospitalisation time, and preventable deaths; thus providing high-quality trauma care \cite{stelfox_evidence_2011, mcdermott_trauma_1994}. Due to the nature of \acrshort{mam} conferences however, they are extremely resource intensive.
 
@@ -247,15 +245,21 @@ As suggested by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} th
 The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} models were implemented with the help of the Synthetic Data Vault framework \cite{patki_sdv_2016} available in Python. The batch size was increased to 1000 samples to include more minority cases in a single batch. Otherwise the standard parameters provided were used.
 
 \subsection{Statistical Analysis}
-%% I think some more work is needed to describe the different sets of models created. In my understanding, you create one set of models for each "synthesiser" and then one set of baseline models. So for Logistic regression you have LRctgan, LRtvae, and LRbl, for random forest RFctgan, RFtvae, and RFbl, and so on. You then compare LRbl with LRctgan and LRbl with LRtvae. Do you also compare LRctgan with LRtvae? Will you calculate a mean delta and compare these, so that you can say if "on avarage" the ctgan performed better than tvae?
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/model_flowchart.pdf}
+    \caption{Flowchart describing the process of evaluating the synthesising models. Process is replicated for each classification model and resample. Each arrow to "Train Classification Model" indicates an individual and separated training/evaluation cycle from the other data inputs. *Synthetic training data output by a data synthesising model.\\ \textit{Definition of abbreviations:} CTGAN = Conditional tabular generative adversarial network; TVAE = Triplet based variational autoencoder.}
+    \label{fig:modelflowchart}
+\end{figure}
 
-The performance of the models was measured using and compared using \acrfull{auc}. The performance was compared by calculating the \acrshort{auc} value on the test split, additionally the \acrshort{auc} delta to each other model was calculated.
-
+%% I think some more work is needed to describe the different sets of models created. In my understanding, you create one set of models for each "synthesiser" and then one set of baseline models. So for Logistic regression you have LRctgan, LRtvae, and LRbl, for random forest RFctgan, RFtvae, and RFbl, and so on. You then compare LRbl with LRctgan and LRbl with LRtvae. Do you also compare LRctgan with LRtvae? Will you calculate a mean delta and compare these, so that you can say if "on avarage" the ctgan performed better than tvae? 
 All statistical analyses were done using Python. The model analyses were run on an 80\%-20\% train-test split 100 times using random resampling without replacement. The estimated 95\% \acrfull{ci} using $t$-distribution was calculated for \acrshort{auc} as well as the delta values using all resamples. A significance level at $p$-value $< 0.05$ was set.
 
-Synthesising models were trained on each resample's raw training data. The synthesising models output an equally large dataset as the training input. The classification models were trained on either the pre-processed resample's training data, the pre-processed synthesising models output, or a combination of both. For each training cycle the classification models were tested on the pre-processed test data from the train-test split and the \acrshort{auc} was calculated.
+Synthesising models were trained on each resample's raw training data. The synthesising models output an equally large dataset as the training input. The classification models were trained on either the pre-processed resample's training data, the pre-processed synthesising models output, or a combination of both (\Cref{fig:modelflowchart}). For each training cycle the classification models were tested on the pre-processed test data from the train-test split and the \acrshort{auc} was calculated. This resulted in each classification model being evaluated 5 times for each resample: using the raw training data, the \acrshort{ctgan} synthetic data, the \acrshort{ctgan} synthetic data in addition to the raw training data, the \acrshort{tvae} synthetic data, and the \acrshort{tvae} synthetic data in addition to the raw training data.
 
-Descriptive statistics using mean, \acrfull{sd}, median, min and mix, and prevalence for the baseline and synthetic data were calculated.
+The performance of the models was measured on each resample's test split and compared using \acrfull{auc}. Additionally, the \acrshort{auc} delta to each other model was calculated for each resample. The performance of a classification model was compared both to models within a data synthesising group and to the models' in the two other groups.
+
+Descriptive statistics were calculated using mean, \acrfull{sd}, median, min and max for continuos features and prevalence for categorical features. Descriptive statistics were calculated for baseline and synthetic datasets.
 
 \subsection{Ethical Considerations}
 The group being studies, trauma patients, could be classified as a vulnerable group. This is because major trauma often leads to disabilities and in some cases death. Therefore, extra thought is needed when considering the ethics behind this study. Additionally, before discussing the ethics, it is important to note that only anonymised registry data was processed in this study. No identifiable personal data was accessible by either the \acrshort{ml} models or authors under the scope of this study.
@@ -270,7 +274,7 @@ In conclusion, from a view point of the four principles of Beauchamp and Childre
 
 \section{Results}
 \subsection{Patient Characteristics}
-\begin{figure}[h]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/flowchart.pdf}
     \caption{Flowchart describing the exclusions made and including the process to determine a case with \acrshort{ofi}. *Defined at 30-days post trauma. \\
@@ -279,7 +283,7 @@ In conclusion, from a view point of the four principles of Beauchamp and Childre
 \end{figure}
 During the years 2014 to 2021, a population of \num{12107} trauma patients were identified. For \num{6314} patients were excluded due to not being screened for an \acrshort{ofi} by either audit filters or individual review, zero patients were excluded for being under the age of 15. In total \num{5793} patients were eligible and included in the study. A large majority of these cases, \num{5453} patients, reached the consensus that no \acrshort{ofi} was present while \num{340} patients were deemed to have at least one \acrshort{ofi}. A summarised graph of inclusion and exclusion criteria including the process to an \acrshort{ofi} is seen in \Cref{fig:flowchart}.
 
-\begin{table}[h!]
+\begin{table}[t!]
     \centering
     \renewcommand{\arraystretch}{0.9}
     \caption{Patient demographic and clinical characteristics subdivided by \acrshort{ofi} outcome for ground truth data.}

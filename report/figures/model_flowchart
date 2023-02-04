@@ -1,0 +1,47 @@
+// Model Flowchart
+digraph {
+	graph [layout=dot nodesep=1 rankdir=lr splines=ortho]
+	node [fontsize=12 shape=record]
+	edge [arrowhead=normal arrowsize=0.5 labelfontsize=11]
+	rankdir=LR
+	swetrau [label="Trauma Registry"]
+	invis1 [height=0 shape=point width=0]
+	swetrau -> invis1 [arrowhead=none]
+	tvaecombdata [label="Data* + training data"]
+	{
+		rank=same
+		evalmodel [label="Evaluate Classification Model"]
+		trainmodel [label="Train Classification Model"]
+	}
+	{
+		rank=same
+		traindata [label="Train data split"]
+		testdata [label="Test data split"]
+	}
+	invis1 -> traindata
+	invis1 -> testdata
+	{
+		ctgan [label="Train CTGAN"]
+		ctgansyndata [label="Produce Data*"]
+	}
+	{
+		tvae [label="Train TVAE"]
+		tvaesyndata [label="Produce Data*"]
+	}
+	ctgancombdata [label="Data* + training data"]
+	invis2 [height=0 shape=point width=0]
+	traindata -> invis2 [arrowhead=none]
+	invis2 -> trainmodel
+	ctgansyndata -> trainmodel
+	tvaesyndata -> trainmodel
+	invis2 -> ctgan
+	ctgan -> ctgansyndata
+	ctgansyndata -> ctgancombdata
+	invis2 -> tvae
+	tvae -> tvaesyndata
+	tvaesyndata -> tvaecombdata
+	ctgancombdata -> trainmodel
+	tvaecombdata -> trainmodel
+	trainmodel -> evalmodel
+	testdata -> evalmodel
+}
