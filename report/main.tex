@@ -7,6 +7,9 @@
 % include pdf
 \usepackage[final]{pdfpages}
 
+% fix titles
+\usepackage{titlesec}
+
 % fix line breaks urls
 \PassOptionsToPackage{hyphens}{url}
 \usepackage[hidelinks]{hyperref}
@@ -32,7 +35,7 @@
 \usepackage[nopostdot,style=super,nonumberlist,toc,nogroupskip,acronym]{glossaries}
 
 % For typesetting
-\usepackage{lipsum}  
+\usepackage{blindtext}
 
 % Double spacing
 \usepackage{setspace}
@@ -49,7 +52,6 @@
 \usepackage{cleveref}
 
 % Fix section titles size/format
-\usepackage{titlesec}
 \titleformat{\section}
   {\normalfont\fontsize{16}{21}\bfseries}
   {\thesection}
@@ -63,7 +65,7 @@
   {}
 
   \titleformat{\subsubsection}
-  {\normalfont\fontsize{12}{14}\itshape}
+  {\normalfont\fontsize{12}{14}\itshape} 
   {\thesubsubsection}
   {1em}
   {}
@@ -101,12 +103,11 @@
 \newacronym{vae}{VAE}{variational variable autoencoder}
 \newacronym{sd}{SD}{standard deviation}
 
-%% I like my definition better "The clinical entity composed by physical injury and the body's associated response". You can cite my thesis ;)
 \newglossaryentry{trauma}
 {
     name=Trauma,
     text=trauma,
-    description={The clinical entity composed by physical injury and the body's associated response \cite{gerdin_risk_2015}.} 
+    description={The clinical entity composed by physical injury and the body's associated response. \cite{gerdin_risk_2015}} 
 }
 
 \newglossaryentry{gofi}
@@ -144,21 +145,23 @@
 
 
 \begin{document}
+\pagenumbering{Roman}
+
 \begin{titlepage}
     \includepdf[pages=-,pagecommand={},fitpaper=true,]{title_page.pdf}
 \end{titlepage}
 
-\pagenumbering{Roman}
+\addcontentsline{toc}{section}{Abstract}
 
 \textbf{Titel}
 
-\lipsum[1]
+\blindtext[2]
 
 \vfill
 
 \textbf{Title}
 
-\lipsum[1]
+\blindtext[2]
 
 \vfill
 
@@ -176,19 +179,20 @@
 \setstretch{1.5}
 
 \section{Introduction}
-\Gls{trauma} is a major contributor to mortality and morbidity for individuals between the ages of 10 and 49 worldwide, and the leading cause of death amongst young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The \gls{trauma} population has a low average age and two-thirds of the group have no history of co-morbidity \cite{brattstrom_socio-economic_2015}. Thus it is essential to ensure high-quality \gls{trauma} care to lower mortality and morbidity for this population with long a age expectancy.
+\Gls{trauma} is a significant contributor to mortality and morbidity for people between the ages of 10 and 49 globally, and it is the leading cause of death among young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The average age of the trauma population is low and two-thirds of this group have no previous history of co-morbidity \cite{brattstrom_socio-economic_2015}. As a result, it is crucial to provide high-quality trauma care to reduce mortality and morbidity rates for this population, which has a long life expectancy.
 
-One method of improving trauma patient care is \acrfull{qi} programmes, as suggested by the World Health Organization (WHO) \cite{world_health_organization_guidelines_2009}. \Acrfull{mam} conferences are a cornerstone in such programmes and aim to identify \acrfull{ofi} in patient care \cite{santana_development_2014}. \acrshort{mam} conferences are conducted by representatives from all disciplines and professions involved in trauma care. During these conferences the treatment provided for an individual patient is discussed and compared against the optimal treatment that should have been provided. Regularly performing such reviews are associated with reducing complication frequencies, hospitalisation time, and preventable deaths; thus providing high-quality trauma care \cite{stelfox_evidence_2011, mcdermott_trauma_1994}. Due to the nature of \acrshort{mam} conferences however, they are extremely resource intensive.
+One way to enhance trauma patient care is through the implementation of Quality Improvement (QI) programs, as recommended by the World Health Organization (WHO) \cite{world_health_organization_guidelines_2009}. \Acrfull{mam}  conferences are a crucial component of these programs and aim to identify \acrfull{ofi} in patient care \cite{santana_development_2014}. These conferences are conducted by representatives from all disciplines and professions involved in trauma care, during which the treatment provided to an individual patient is evaluated and compared to the optimal treatment that should have been provided. Regularly conducting these reviews is linked to a reduction in complication rates, hospital stay time, and preventable deaths, thereby providing high-quality trauma care \cite{stelfox_evidence_2011, mcdermott_trauma_1994}.  However, due to their nature, \acrshort{mam} conferences are highly resource-intensive.
 
-An \acrshort{ofi} is a concrete deficiency in patient care and often occur in initial care, such as airway management, fluid resuscitation, haemorrhage control, and chest injury management \cite{world_health_organization_guidelines_2009,roy_learning_2017,oreilly_opportunities_2013,sanddal_analysis_2011}.
+An \acrshort{ofi} refers to a specific deficit in patient care and often occurs in initial care, including airway management, fluid resuscitation, haemorrhage control, and chest injury management \cite{world_health_organization_guidelines_2009,roy_learning_2017,oreilly_opportunities_2013,sanddal_analysis_2011}.
 
-A more advanced \acrshort{qi} technique suggested by WHO is the application of audit filters that use electronic health record systems to monitor predefined variables to flag patient cases with potential \acrfull{ofi} \cite{world_health_organization_guidelines_2009}. Filtering cases using an audit filter before reviewing by an \acrshort{mam} conference provides a possibility to reduce false positive cases and thus reducing the costs of the \acrshort{qi} programme as a whole.
+A more advanced \acrshort{qi} technique suggested by World Health Organization is the application of audit filters that use electronic health record systems to monitor predefined variables to flag patient cases with potential \acrfull{ofi} \cite{world_health_organization_guidelines_2009}. Filtering cases with an audit filter system before reviewing by an \acrshort{mam} conference provides a possibility to reduce false positive cases and thus reducing the costs of the \acrshort{qi} programme as a whole.
 
-However, the performance of such systems varies and have been associated with high frequencies of false positives. Depending on context the frequency of false positives can range from 24\% to 80\% \cite{attergrim_predicting_2023,sanddal_analysis_2011,roy_learning_2017,ghorbani_analysis_2018}.
+However, the performance of these systems is inconsistent and has been linked to high rates of false positives. Depending on the context, the frequency of false positives can range from 24\% to 80\% \cite{attergrim_predicting_2023,sanddal_analysis_2011,roy_learning_2017,ghorbani_analysis_2018}.
 
-A new method suggested by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} suggests to replace audit filter systems with supervised \acrfull{ml} models. These newer models achieve a significantly better performance than the currently used audit filter system at Karolinska University Hospital in Stockholm, Sweden. At the same sensitivity, the false positive rate is reduced from 68\% to 53\% using the same data.
+A new approach proposed by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} recommends replacing audit filter systems with supervised \acrfull{ml} models. These newer models exhibit a significantly improved performance compared to the audit filter system currently used at Karolinska University Hospital in Stockholm, Sweden. When maintaining the same sensitivity, the false positive rate was reduced from 68\% to 53\% with the use of the same data.
 
-Despite this performance boost, the models' still suffer from that 50\% of patient cases are incorrectly flagged as \acrshort{ofi} positive. \acrshort{ml} methods in general require large amounts of data to be able to perform \cite{piccialli_survey_2021}. Many methods exist to increase the performance of \acrshort{ml} models, and perhaps the most fundamental and well known is simply increasing the sheer amount of data. So far, the only possible method in doing so was by manually collecting more data and annotating it. This is a slow process, and in some cases not possible due to the fundamental lack of data.
+
+Despite the improved performance, the models still have a problem in that 50\% of patient cases are inaccurately marked as \acrshort{ofi} positive. \acrshort{ml} methods generally require substantial amounts of data to perform effectively \cite{piccialli_survey_2021}. There are several ways to enhance the performance of \acrshort{ml} models, and the most basic and well-known is simply increasing the amount of data. Until now, the only option for doing so was by manually gathering more data and annotating it. This process is slow, and in some cases, not feasible due to a shortage of data.
 
 \begin{figure}[t]
     \centering
@@ -197,20 +201,20 @@ Despite this performance boost, the models' still suffer from that 50\% of patie
     \label{fig:gan-xray}
 \end{figure}
 
-Recently however, using \acrfullpl{gan} to generate synthetic data has become a hot topic in image analysis \cite{pavan_kumar_generative_2021}. See \Cref{fig:gan-xray} for an example usage of \acrshortpl{gan} in image analysis. A \acrshort{gan} is a type of artificial neural network. It consists of two main parts: a generator and a discriminator. The generator is trained to produce new data samples that are similar to the input data, while the discriminator is trained to distinguish between the generated samples and the real data.
+Recently, the use of \acrfullpl{gan} to generate synthetic data has become a popular topic in image analysis \cite{pavan_kumar_generative_2021}. See \Cref{fig:gan-xray} for an example usage of \acrshortpl{gan} in image analysis. A \acrshort{gan} is a type of artificial neural network consisting of two main components: a generator and a discriminator. The generator is trained to produce new data samples that resemble the input data, while the discriminator is trained to differentiate between the generated samples and the real data.
 
-The generator and discriminator are trained together, in an adversarial manner: the generator tries to produce samples that the discriminator cannot correctly identify as fake, while the discriminator tries to correctly identify the fake samples produced by the generator. Through this process, the generator learns to produce samples that are similar to the input data, and the discriminator learns to recognize the differences between the real and generated data. Thus the two generator constantly evolves to be able to produce data more closely to the source that the discriminator cannot differentiate as synthetic data.
+The generator and discriminator are trained together in an adversarial manner. The generator aims to produce samples that the discriminator cannot identify as fake, while the discriminator strives to accurately identify the fake samples generated by the generator. This process allows the generator to learn to produce samples that resemble the input data, and the discriminator to learn to distinguish between real and generated data. As a result, the generator continually improves, producing data that more closely resembles the source and becomes increasingly difficult for the discriminator to identify as synthetic data.
 
-Another form of artificial neural network generative models are the \acrfull{vae} \cite{kingma_auto-encoding_2013}. It is a simpler and more compact model that works by learning the probabilistic representation of a dataset, called the latent space. The latent space can be described as a compressed representation of the input data that captures the most important features and variations in the data. The \acrshort{vae} consists of two main parts: an encoder and a decoder. The encoder takes in the input data and maps it to a probability distribution in the latent space, while the decoder takes a sample from this distribution and maps it back to the original data space. By training the \acrshort{vae}, we can learn a compact representation of the input data that captures the most important features and variations in the dataset.
+Another type of generative model in artificial neural networks is the \acrfull{vae} \cite{kingma_auto-encoding_2013}. It is a simpler and more compact model that learns the probabilistic representation of a dataset, called the latent space. This representation is a compressed form of the input data that captures its most important features and variations. The \acrshort{vae} consists of two parts: an encoder and a decoder. The encoder maps the input data to a probability distribution in the latent space, while the decoder maps a sample from that distribution back to the original data space. By training the \acrshort{vae}, we learn a compact representation of the input data that highlights its important features and variations.
 
-The quality of the generated data often varies and depends on several factors, such as, the quality and amount of ground truth data \cite{karras_training_2020}. The major benefit of having a method for generating quality synthetic data is the possibility of expanding small datasets and training \acrshort{ml} models where it was not previously possible or did not achieve adequate results due to data amount.
+The quality of the generated data from these methods often varies and is dependent on several factors, such as the quality and quantity of the ground truth data \cite{karras_training_2020}.  The major advantage of having a method for generating high-quality synthetic data is the ability to enlarge small datasets and train \acrshort{ml}  models in cases where it was not feasible before, or did not produce satisfactory results due to a lack of data.
 
 In addition to generating more trainable data, some \acrshortpl{gan} are able to anonymise data \cite{liu_ppgan_2019} and provide an interface for being able to generate synthetic datasets of sensitive personal information that are completely anonymous. These synthetic datasets can, in theory, be distributed and increase the availability of medical datasets for researchers.
 
-However, using \acrshortpl{gan} is rare and relatively unexplored for structured tabular data. Few articles exist investigating the feasibility of generating synthetic tabular data in a medical context.
+However, the use of \acrshortpl{gan} for structured tabular data is relatively uncommon and largely unexplored. There are few studies that investigate the possibility of generating synthetic tabular data in a medical context.
 
 \subsection{Aim}
-Therefore, the aim of this article is to evaluate the effectiveness of using \acrshortpl{gan} for generating synthetic tabular data in a trauma setting, and to investigate the potential of this approach for improving \acrshort{ofi} prediction models.
+The aim of this article is to evaluate the effectiveness of using generative adversarial networks  \acrshortpl{gan} for generating synthetic tabular data in a trauma setting, and to explore the potential of this approach for improving \acrshort{ofi} prediction models.
 
 \section{Materials and Methods}
 We conducted a retrospective study using registry data from Karolinska University Hospital, comparing the performance of supervised machine learning models that were trained with synthetic data and those that were not, by analysing all trauma patients in the trauma registry and quality database from 2014 to 2021.
@@ -218,31 +222,33 @@ We conducted a retrospective study using registry data from Karolinska Universit
 The code used in this study is available online at \url{https://codeberg.org/kelszo/ofi-synthesiser} under the \textit{GNU Affero General Public License v3.0} license.
 
 \subsection{Study Population and Setting}
-Karolinska University Hospital in Solna, Sweden manages approximately 1500 acute trauma patients per year making it equivalent to a level 1 trauma center. The hospital reports all patients admitted with an \acrfull{iss} score more than 9, as well as, all patients admitted with trauma team activation regardless of \acrshort{iss} score to the \acrfull{swetrau} \cite{swetrau}. \acrshort{swetrau} inlcudes data on patient parameters, such as, blood pressure, heart rate, and respiratory rate, as well, injuries, interventions, and various checkpoint times. The registry is compliant with the Utstein template for uniform reporting of data following major trauma \cite{ringdal_utstein_2008}.
+Karolinska University Hospital in Solna, Sweden manages approximately 1500 acute trauma patients annually, making it a level 1 trauma center. The hospital reports all patients admitted with an \acrfull{iss} score of more than 9, as well as all patients admitted with trauma team activation regardless of \acrshort{iss}, to the \acrfull{swetrau} \cite{swetrau}. \acrshort{swetrau} includes data on patient parameters such as blood pressure, heart rate, and respiratory rate, as well as injuries, interventions, and various checkpoint times. The registry is compliant with the Utstein template for uniform reporting of data following major trauma. \cite{ringdal_utstein_2008}.
 
-Parallel with this registry Karolinska University Hospital maintains an internal \acrshort{qi} registry known here as the quality database. The quality database includes data relating to the \acrshort{qi} program and \acrshort{mam} conferences, such as, audit filter results, identified \acrshortpl{ofi} and their recommended corrective actions. For all currently used audit filters at Karolinska University Hospital see \Cref{tab:auditfilters} in the appendix.
+Parallel to the registry, Karolinska University Hospital maintains an internal \acrshort{qi} registry known here as the quality database.  This database contains information related to the \acrshort{qi} program and \acrshort{mam} conferences, including audit filter results and identified \acrshortpl{ofi} and their recommended corrective actions. A table containing all currently used audit filters at the hospital can be found in the appendix (\Cref{tab:auditfilters}).
 
-The Karolinska University Hospital conducts multidisciplinary conferences to review the outcomes of trauma patients, involving all healthcare professionals involved in their initial care, this includes surgery, anaesthesia, orthopaedics, intensive care, radiology, and nursing. \acrshort{ofi} are identified through a consensus decision, and appropriate corrective actions are suggested. Mortality cases immediately escalated to the mortality conference while morbidity cases includes escalating levels of reviews. Mortality conferences conclude whether a patient mortality was preventable or possibly preventable. The review process for morbidity cases was improved and formalized during the study period, with audit filters applied to the trauma quality database and individual reviews by specialised nurses were added in 2017. Between years 2014 and 2017, a specialised trauma nurse selectively reviewed trauma patients to identify possible \acrshortpl{ofi} to escalate to a \acrshort{mam} conference. Following 2017, a specialised nurse registered data to the trauma registry while at the same time looking for possible audit filter violations (including a possible manual violation flag) and applying them to the trauma quality database. If a violation was detected, the patient was reviewed again by two specialised nurses. If the second review could not exclude a possible \acrshort{ofi} the patient case was finally escalated to a morbidity conference for a final verdict.
+The Karolinska University Hospital conducts multidisciplinary conferences to review the outcomes of trauma patients, involving all healthcare professionals involved in their initial care. This includes surgery, anaesthesia, orthopaedics, intensive care, radiology, and nursing. \acrshort{ofi} are identified through a consensus decision, and appropriate corrective actions are suggested. Mortality cases are immediately escalated to the mortality conference, while morbidity cases include escalating levels of reviews. The mortality conferences conclude whether a patient's mortality was preventable or possibly preventable. The review process for morbidity cases was improved and formalized during the study period, with audit filters applied to the trauma quality database and individual reviews by specialized nurses added in 2017.
+
+Between 2014 and 2017, a specialized trauma nurse selectively reviewed trauma patients to identify possible \acrshortpl{ofi} to escalate to a \acrshort{mam} conference. Following 2017, a specialized nurse registered data to the trauma registry while at the same time looking for possible audit filter violations (including a possible manual violation flag) and applying them to the trauma quality database. If a violation was detected, the patient was reviewed again by two specialized nurses. If the second review could not exclude a possible \acrshort{ofi}, the patient case was finally escalated to a morbidity conference for a final verdict.
 
 All patients screened for \acrshort{ofi} between 2014 and 2021 were included. Patients under the age of 15 were excluded due to differing clinical pathway.
 
 \subsection{Predictor Variables}
-All variables included in the trauma registry and the revised Utstein template for major trauma were used as predictors for both \acrshort{ofi} classification and data synthesising \acrshort{ml} models. The predictors included both categorical and continuos values, including but not limited to, blood pressure, interventions, injury mechanisms and intentions, care length and level, and time points. The trauma registry includes data for the whole patient care, including pre-hospital setting and treatment, in-hospital care, and outcome in the form of Glasgow Outcome Scale and mortality. For a complete list of predictors, and their respective definitions, see the revised Utstein template for major trauma \cite{ringdal_utstein_2008} or \Cref{tab:predictors} in the appendix.
+All variables included in the trauma registry and the revised Utstein template for major trauma were used as predictors for both \acrshort{ofi} classification and data synthesising \acrshort{ml} models. The predictors included both categorical and continuous values, such as blood pressure, interventions, injury mechanisms and intentions, care length and level, and time points. The trauma registry includes data for the entire patient care, including pre-hospital setting and treatment, in-hospital care, and outcome in the form of Glasgow Outcome Scale and mortality. For a complete list of predictors and their definitions, see the revised Utstein template for major trauma \cite{ringdal_utstein_2008} or \Cref{tab:predictors} in the appendix.
 
 \subsection{Outcome variable}
 The outcome was defined as the verdict from the \acrshort{mam} conference with the binary levels of "Yes - At least one \acrshort{ofi} identified" or "No - No \acrshort{ofi} identified". Preventable or possible preventable deaths were considered as an \acrshort{ofi}.
 
 \subsection{Model Development and Data preprocessing}
-All model development and data preprocessing was performed in Python. The model development can be separated in the development of the classification and synthesising models. For more specifics regarding implementation specifics, versions, and packages see the project source code.
+All model development and data preprocessing was carried out in Python. The model development process was divided into two parts: the development of the classification models and the development of the synthesising models. For detailed information regarding implementation specifics, versions, and packages, see the project source code.
 
 \subsubsection*{Data preprocessing}
-A pre-processor was developed to be able to pre-process both the training and test data without any leakage. This was done by rescaling continuous features using Yeo-Johnson's power transformation \cite{yeo_new_2000} and encoding nominal features using one-hot encoding. Ordinal features were left unchanged. Continuous features were imputed by using the mean of the feature, ordinal by using the most frequent value, and nominal by adding an "unknown" category. An exception was made for both the pre-hospital and emergency department blood pressure and respiratory rate, they were imputed by using the mean value of the revised trauma score category \cite{ringdal_utstein_2008}, if it existed. The pre-processor was trained and applied on the training data to be there after only applied to the test data, thus no data leakage occurred between the test and training set.
+A preprocessor was developed to preprocess both the training and test data without any data leakage. This was achieved by transforming continuous features using Yeo-Johnson's power transformation \cite{yeo_new_2000} and encoding nominal features using one-hot encoding. Ordinal features remained unchanged. Continuous features were imputed using the mean of the feature, ordinal features using the most frequent value, and nominal features using an "unknown" category. An exception was made for blood pressure and respiratory rate in the pre-hospital and emergency department, which were imputed using the mean value of the revised trauma score category \cite{ringdal_utstein_2008} if it existed. The preprocessor was trained on the training data and then applied to the test data, ensuring no data leakage between the test and training sets.
 
 \subsubsection*{Classification models}
-As suggested by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} the following models were traditional methods were implemented with scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, decision tree, support vector machine, k-nearest neighbour. The following boosting methods were implemented using the provided Python implementation: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was run all models, using the first resamples training data through a 5-fold cross validation. The suggested parameters, found either by the source documentation or implementation documentation, were optimised using Tree-structured Parzen Estimator \cite{bergstra_algorithms_2011} for a total of 1 hour per model.
+As suggested by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023}, the following traditional methods were implemented using scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, ensemble of decision trees, support vector machine, and k-nearest neighbor. The following boosting methods were implemented using their respective Python implementations: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was performed on all models using the first resampled training data, with a 5-fold cross-validation. The suggested parameters found in the source or implementation documentation were optimized using Tree-structured Parzen Estimator \cite{bergstra_algorithms_2011} for a total of 1 hour per model.
 
 \subsubsection*{Synthesising models}
-The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} models were implemented with the help of the Synthetic Data Vault framework \cite{patki_sdv_2016} available in Python. The batch size was increased to 1000 samples to include more minority cases in a single batch. Otherwise the standard parameters provided were used.
+The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} models were implemented with the assistance of the Synthetic Data Vault framework \cite{patki_sdv_2016} in Python. The batch size was increased to 1000 samples to incorporate a higher number of minority cases in a single batch. The standard parameters provided were otherwise used.
 
 \subsection{Statistical Analysis}
 \begin{figure}[h]
@@ -253,24 +259,24 @@ The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae
 \end{figure}
 
 %% I think some more work is needed to describe the different sets of models created. In my understanding, you create one set of models for each "synthesiser" and then one set of baseline models. So for Logistic regression you have LRctgan, LRtvae, and LRbl, for random forest RFctgan, RFtvae, and RFbl, and so on. You then compare LRbl with LRctgan and LRbl with LRtvae. Do you also compare LRctgan with LRtvae? Will you calculate a mean delta and compare these, so that you can say if "on avarage" the ctgan performed better than tvae? 
-All statistical analyses were done using Python. The model analyses were run on an 80\%-20\% train-test split 100 times using random resampling without replacement. The estimated 95\% \acrfull{ci} using $t$-distribution was calculated for \acrshort{auc} as well as the delta values using all resamples. A significance level at $p$-value $< 0.05$ was set.
+All statistical analyses were performed using Python. The model analyses were conducted by splitting the data into an 80\%-20\% train-test and repeating the process 100 times using random resampling without replacement. The estimated 95\% \acrfull{ci} using $t$-distribution was calculated for \acrfull{auc} as well as the delta values, using all resamples. A significance level at $p$-value $< 0.05$ was set.
 
-Synthesising models were trained on each resample's raw training data. The synthesising models output an equally large dataset as the training input. The classification models were trained on either the pre-processed resample's training data, the pre-processed synthesising models output, or a combination of both (\Cref{fig:modelflowchart}). For each training cycle the classification models were tested on the pre-processed test data from the train-test split and the \acrshort{auc} was calculated. This resulted in each classification model being evaluated 5 times for each resample: using the raw training data, the \acrshort{ctgan} synthetic data, the \acrshort{ctgan} synthetic data in addition to the raw training data, the \acrshort{tvae} synthetic data, and the \acrshort{tvae} synthetic data in addition to the raw training data.
+The synthesising models were trained on the raw training data from each resample. The synthesising models generated an output dataset with an equal size to the input training data. The classification models were trained on either the pre-processed training data from the resample, the pre-processed output of the synthesising models, or a combination of both (\Cref{fig:modelflowchart}). During each training cycle, the classification models were tested on the pre-processed test data from the train-test split, and the \acrshort{auc} was calculated. This resulted in each classification model being evaluated five times for each resample: using the raw training data, the \acrshort{ctgan} synthetic data, a combination of the raw training data and \acrshort{ctgan} synthetic data, the \acrshort{tvae} synthetic data, and a combination of the raw training data and \acrshort{tvae} synthetic data. Each data input mentioned is referred to as a data group.
 
-The performance of the models was measured on each resample's test split and compared using \acrfull{auc}. Additionally, the \acrshort{auc} delta to each other model was calculated for each resample. The performance of a classification model was compared both to models within a data synthesising group and to the models' in the two other groups.
+The performance of the models was assessed on the test split from each resample and compared using \acrshort{auc}. Additionally, the delta \acrshort{auc} for each model was calculated for each resample. The performance of a classification model was compared both to models within the same data group and to models in different data groups. Finally, the average delta \acrshort{auc} was calculated for each data group and compared to other groups.
 
-Descriptive statistics were calculated using mean, \acrfull{sd}, median, min and max for continuos features and prevalence for categorical features. Descriptive statistics were calculated for baseline and synthetic datasets.
+Descriptive statistics, including mean, \acrfull{sd}, median, minimum, and maximum for continuous features, and prevalence for categorical features, were calculated. Descriptive statistics were computed for both the baseline and synthetic datasets.
 
 \subsection{Ethical Considerations}
-The group being studies, trauma patients, could be classified as a vulnerable group. This is because major trauma often leads to disabilities and in some cases death. Therefore, extra thought is needed when considering the ethics behind this study. Additionally, before discussing the ethics, it is important to note that only anonymised registry data was processed in this study. No identifiable personal data was accessible by either the \acrshort{ml} models or authors under the scope of this study.
+The group under investigation in this study, trauma patients, can be considered a vulnerable population due to the severe outcomes that often result from major trauma, such as disability and death. Thus, special consideration must be given to the ethics of conducting this study. It is important to note that only anonymous registry data was used in this study, and no identifiable personal data was accessible by the authors or the \acrshort{ml} models.
 
-In respects to autonomy and non-maleficence, no interventions were made that could possibly harm the patient. However, \acrshort{swetrau}, like most other registries, builds upon the foundation of presumed consent. In other words, if the patient does not explicitly, or in other ways, express that they do not wish to be a part of the registry, it is presumed that they do. It is however possible, upon request, to be removed from the registry. Due to the nature of the study, there is a near zero risk of hurting the study population. Furthermore, due to the lack of sensitive personal data, this study does not risk harming or stigmatising a societal or patient group.
+In terms of autonomy and non-maleficence, no interventions were made that could potentially harm the patients. The registry on which this study was based, \acrshort{swetrau}, operates under the assumption of presumed consent, meaning that if a patient does not explicitly opt out of being included in the registry, it is assumed that they have consented to participate. While this study poses almost no risk of harm to the study population, the absence of sensitive personal data also reduces the risk of stigmatising a particular group.
 
-The study acts in beneficence, the aim of the study was to improve clinical models for identifying \acrshortpl{ofi}. Being able to efficiently identify \acrshortpl{ofi} means being able to take necessary corrective actions and improve care in the long run. The study fills an important knowledge gap on possible methods to improve \acrshort{ml} model performance.
+The study aligns with the principle of beneficence, as its purpose is to improve clinical models for detecting \acrshortpl{ofi} and improve patient care in the long run. The study provides valuable insights into methods to improve the performance of \acrshort{ml} models in this area.
 
-Though not part of this studies scope, it is of interest to ponder the ethical considerations if personal data would have been involved. If a synthesising model could theoretically produce 100\% anonymised synthesised data, does the new data require the same four ethical considerations to be made? The new data does not include any real patients, thus making it hard to consider autonomy and justice. One can conduct, without much ethical consideration, any sort epidemiological study on randomly or simulated data. Should one therefore be able to conduct any sort of study on the new data? These are considerations that one must reach some sort of concensus around before synthesising models are able to produce ultra-high-quality synthetic data that is 100\% anonymised.
+The ethical considerations associated with synthesising personal data warrant further discussion. If it were possible to generate 100\% anonymous synthesised data, would the same ethical principles apply? Since the synthesised data does not represent actual patients, it is difficult to consider autonomy and justice in this context. However, conducting epidemiological studies on randomly generated or simulated data is typically done without much ethical consideration. There needs to be a consensus on these ethical considerations before synthesising models are able to produce highly accurate synthetic data.
 
-In conclusion, from a view point of the four principles of Beauchamp and Childress - autonomy, non-maleficence, beneficence and justice - the benefits of this study outweigh its possible risks. The study was approved by Stockholm Research Ethics Review Board (permits 2021-02541 and 2021-03531).
+In conclusion, the benefits of this study, as measured against the four principles of Beauchamp and Childress (autonomy, non-maleficence, descence, and justice), outweigh the potential risks. The study was approved by the Stockholm Research Ethics Review Board (permits 2021-02541 and 2021-03531).
 
 \section{Results}
 \subsection{Patient Characteristics}
@@ -358,7 +364,7 @@ During the years 2014 to 2021, a population of \num{12107} trauma patients were 
         \textit{Definition of abbreviations:} OFI = Opportunity for Improvement; ED = Emergency Department; GCS = Glascow Coma Scale.}
 \end{table}
 
-Selected patient characteristics are summarised in \Cref{tab:tableone}. The trauma group as a whole had a mean age of 46 (\acrshort{sd}: 21) while the \acrshort{ofi} and \acrshort{ofi} negative subgroup had a mean age of 50 (\acrshort{sd}: 22) and 45 (\acrshort{sd}: 21) respectively. The majority were male ($n = $ \num{3509}, 61\%) and the overall group had a mortality of 6\% ($n = $ \num{331}). The \acrshort{ofi} group had a higher mean \acrshort{iss} (18 [\acrshort{sd}: 10] vs 10 [\acrshort{sd}: 11]) and were admitted to the intensive care unit more frequently (30\% [$n = $ \num{286}] vs 14\% [$n = $ \num{761}]). Data for emergency procedure was less missing the the \acrshort{ofi} subgroup with 54\% ($n = $ 182) of records missing data compared to 82\% ($n = $ \num{4452}) in the \acrshort{ofi} negative group. Furthermore, the emergency procedure "other" was more common in the \acrshort{ofi} group (26\% [$n = $ \num{88}] vs 13\% [$n = $ \num{699}]).
+Selected patient characteristics are summarised in \Cref{tab:tableone}. The trauma group as a whole had a mean age of 46 (\acrshort{sd}: 21) while the \acrshort{ofi} and \acrshort{ofi} negative subgroup had a mean age of 50 (\acrshort{sd}: 22) and 45 (\acrshort{sd}: 21) respectively. The majority were male ($n = $ \num{3509}, 61\%) and the overall group had a mortality of 6\% ($n = $ \num{331}). The \acrshort{ofi} group had a higher mean \acrshort{iss} (18 [\acrshort{sd}: 10] vs 10 [\acrshort{sd}: 11]) and were admitted to the intensive care unit more frequently (30\% [$n = $ \num{286}] vs 14\% [$n = $ \num{761}]). Data for emergency procedure was less missing in the \acrshort{ofi} subgroup with 54\% ($n = $ 182) of records missing data compared to 82\% ($n = $ \num{4452}) in the \acrshort{ofi} negative group. Furthermore, the emergency procedure "other" was more common in the \acrshort{ofi} group (26\% [$n = $ \num{88}] vs 13\% [$n = $ \num{699}]).
 
 Selected patient characteristics for the data produced by the synthesising models are presented in \Cref{tab:ctgandata, tab:tvaedata} in the appendix.
 
