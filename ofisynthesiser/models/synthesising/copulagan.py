@@ -3,8 +3,8 @@ import sdv.tabular
 
 
 def generate_data_copula_gan(data: pd.DataFrame, cuda: bool, debug: bool = False) -> pd.DataFrame:
-    epochs = 500
-    batch_size = 2000
+    epochs = 300
+    batch_size = 500
 
     if debug:
         epochs = 1

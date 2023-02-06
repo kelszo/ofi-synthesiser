@@ -15,11 +15,13 @@ smote_variants
 # Dev deps
 black
 jedi
-jupyter-core
 nbconvert
 pyls-black
 pyls-isort
 python-lsp-server
+tableone
+ipykernel
+graphviz
 
 #autogluon.tabular
 #autoPyTorch

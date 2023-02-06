@@ -1,14 +1,17 @@
-docker_build:
-	nix-build ./docker.nix -o ./local/docker-image.tar.gz 
+podman_build:
+	nix-build -o ./local/docker-image.tar.gz 
 
-docker_cuda_build:
-	nix-build ./docker.nix -o ./local/docker-cuda-image.tar.gz --arg cuda true
+podman_cuda_build:
+	podman build -f Containerfile -t ofi-synthesiser:latest
 
-docker_load:
-	podman load < ./local/docker-image.tar.gz
+podman_cuda_save:
+	podman save ofi-synthesiser:latest | gzip > local/docker-image-cuda.tar.gz
 
-docker_run:
+podman_load:
+	podman load < ./local/docker-image-cuda.tar
+
+podman_run:
 	podman run --name ofi-synthesiser --rm --volume=$(pwd)/out:/out localhost/ofi-synthesiser:latest 
 
 docker_run_cuda:
-	nvidia-docker run --name ofi-synthesiser -d --rm  --gpus all --volume=$(pwd)/out:/out ofi-synthesiser:cuda
+	nvidia-docker run --name ofi-synthesiser -d  --gpus all --volume=$(pwd)/out:/out localhost/ofi-synthesiser:latest python -m ofisynthesiser.executors.run

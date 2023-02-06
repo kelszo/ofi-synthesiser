@@ -8,8 +8,10 @@ import scipy.stats as st
 
 results = None
 
-with open("out/230116-2003-results.pickle", "rb") as handle:
+with open("out/230130-1108-results.pickle", "rb") as handle:
     results = pickle.load(handle)
+
+print(results)
 
 model_names = list(results[0].keys())
 model_names.remove("TARGET")
