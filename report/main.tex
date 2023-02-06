@@ -34,9 +34,6 @@
 % Acronyms
 \usepackage[nopostdot,style=super,nonumberlist,toc,nogroupskip,acronym]{glossaries}
 
-% For typesetting
-\usepackage{blindtext}
-
 % Double spacing
 \usepackage{setspace}
 
@@ -155,13 +152,9 @@
 
 \textbf{Titel}
 
-\blindtext[2]
-
 \vfill
 
 \textbf{Title}
-
-\blindtext[2]
 
 \vfill
 
@@ -181,16 +174,15 @@
 \section{Introduction}
 \Gls{trauma} is a significant contributor to mortality and morbidity for people between the ages of 10 and 49 globally, and it is the leading cause of death among young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The average age of the trauma population is low and two-thirds of this group have no previous history of co-morbidity \cite{brattstrom_socio-economic_2015}. As a result, it is crucial to provide high-quality trauma care to reduce mortality and morbidity rates for this population, which has a long life expectancy.
 
-One way to enhance trauma patient care is through the implementation of Quality Improvement (QI) programs, as recommended by the World Health Organization (WHO) \cite{world_health_organization_guidelines_2009}. \Acrfull{mam}  conferences are a crucial component of these programs and aim to identify \acrfull{ofi} in patient care \cite{santana_development_2014}. These conferences are conducted by representatives from all disciplines and professions involved in trauma care, during which the treatment provided to an individual patient is evaluated and compared to the optimal treatment that should have been provided. Regularly conducting these reviews is linked to a reduction in complication rates, hospital stay time, and preventable deaths, thereby providing high-quality trauma care \cite{stelfox_evidence_2011, mcdermott_trauma_1994}.  However, due to their nature, \acrshort{mam} conferences are highly resource-intensive.
-
-An \acrshort{ofi} refers to a specific deficit in patient care and often occurs in initial care, including airway management, fluid resuscitation, haemorrhage control, and chest injury management \cite{world_health_organization_guidelines_2009,roy_learning_2017,oreilly_opportunities_2013,sanddal_analysis_2011}.
+One way to enhance trauma patient care is through the implementation of Quality Improvement (QI) programs, as recommended by the World Health Organization (WHO) \cite{world_health_organization_guidelines_2009}. \Acrfull{mam}  conferences are a crucial component of these programs and aim to identify \acrfull{ofi} in patient care \cite{santana_development_2014}. An \acrshort{ofi} refers to a specific deficit in patient care and often occurs in initial care, including airway management, fluid resuscitation, haemorrhage control, and chest injury management \cite{world_health_organization_guidelines_2009,roy_learning_2017,oreilly_opportunities_2013,sanddal_analysis_2011}. These conferences are conducted by representatives from all disciplines and professions involved in trauma care, during which the treatment provided to an individual patient is evaluated and compared to the optimal treatment that should have been provided. Regularly conducting these reviews is linked to a reduction in complication rates, hospital stay time, and preventable deaths, thereby providing high-quality trauma care \cite{stelfox_evidence_2011, mcdermott_trauma_1994}.  However, due to their nature, \acrshort{mam} conferences are highly resource-intensive.
 
 A more advanced \acrshort{qi} technique suggested by World Health Organization is the application of audit filters that use electronic health record systems to monitor predefined variables to flag patient cases with potential \acrfull{ofi} \cite{world_health_organization_guidelines_2009}. Filtering cases with an audit filter system before reviewing by an \acrshort{mam} conference provides a possibility to reduce false positive cases and thus reducing the costs of the \acrshort{qi} programme as a whole.
 
 However, the performance of these systems is inconsistent and has been linked to high rates of false positives. Depending on the context, the frequency of false positives can range from 24\% to 80\% \cite{attergrim_predicting_2023,sanddal_analysis_2011,roy_learning_2017,ghorbani_analysis_2018}.
 
-A new approach proposed by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} recommends replacing audit filter systems with supervised \acrfull{ml} models. These newer models exhibit a significantly improved performance compared to the audit filter system currently used at Karolinska University Hospital in Stockholm, Sweden. When maintaining the same sensitivity, the false positive rate was reduced from 68\% to 53\% with the use of the same data.
+However, a newer approach proposed by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} recommends replacing audit filter systems with supervised \acrfull{ml} models. These newer models exhibit a significantly improved performance compared to the audit filter system currently used at Karolinska University Hospital in Stockholm, Sweden. When maintaining the same sensitivity, the false positive rate was reduced from 68\% to 53\% with the use of the same data. \acrshort{ml} in trauma has existed for some time and most studies investigate the application of \acrshort{ml} models in prediction mortality and complications \cite{zhang_machine_2022}. This is the first time that \acrshort{ml} models have been used to predict \acrshort{ofi} in trauma care.
 
+The models investigated by Attegrim and Szolnoky et al. include traditional \acrshort{ml} methods: logistic regression, random forest \cite{breiman_random_2001}, decision trees, support vector machines \cite{cortes_support-vector_1995}, as well as newer boosting models: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. The overall best performing model was LightGBM.
 
 Despite the improved performance, the models still have a problem in that 50\% of patient cases are inaccurately marked as \acrshort{ofi} positive. \acrshort{ml} methods generally require substantial amounts of data to perform effectively \cite{piccialli_survey_2021}. There are several ways to enhance the performance of \acrshort{ml} models, and the most basic and well-known is simply increasing the amount of data. Until now, the only option for doing so was by manually gathering more data and annotating it. This process is slow, and in some cases, not feasible due to a shortage of data.
 
@@ -205,16 +197,16 @@ Recently, the use of \acrfullpl{gan} to generate synthetic data has become a pop
 
 The generator and discriminator are trained together in an adversarial manner. The generator aims to produce samples that the discriminator cannot identify as fake, while the discriminator strives to accurately identify the fake samples generated by the generator. This process allows the generator to learn to produce samples that resemble the input data, and the discriminator to learn to distinguish between real and generated data. As a result, the generator continually improves, producing data that more closely resembles the source and becomes increasingly difficult for the discriminator to identify as synthetic data.
 
+In addition to generating more trainable data, some \acrshortpl{gan} are able to anonymise data \cite{liu_ppgan_2019} and provide an interface for being able to generate synthetic datasets of sensitive personal information that are completely anonymous. These synthetic datasets can, in theory, be distributed and increase the availability of medical datasets for researchers.
+
 Another type of generative model in artificial neural networks is the \acrfull{vae} \cite{kingma_auto-encoding_2013}. It is a simpler and more compact model that learns the probabilistic representation of a dataset, called the latent space. This representation is a compressed form of the input data that captures its most important features and variations. The \acrshort{vae} consists of two parts: an encoder and a decoder. The encoder maps the input data to a probability distribution in the latent space, while the decoder maps a sample from that distribution back to the original data space. By training the \acrshort{vae}, we learn a compact representation of the input data that highlights its important features and variations.
 
 The quality of the generated data from these methods often varies and is dependent on several factors, such as the quality and quantity of the ground truth data \cite{karras_training_2020}.  The major advantage of having a method for generating high-quality synthetic data is the ability to enlarge small datasets and train \acrshort{ml}  models in cases where it was not feasible before, or did not produce satisfactory results due to a lack of data.
 
-In addition to generating more trainable data, some \acrshortpl{gan} are able to anonymise data \cite{liu_ppgan_2019} and provide an interface for being able to generate synthetic datasets of sensitive personal information that are completely anonymous. These synthetic datasets can, in theory, be distributed and increase the availability of medical datasets for researchers.
-
-However, the use of \acrshortpl{gan} for structured tabular data is relatively uncommon and largely unexplored. There are few studies that investigate the possibility of generating synthetic tabular data in a medical context.
+However, the use of \acrshortpl{gan} and \acrshortpl{vae} for structured tabular data is relatively uncommon and largely unexplored. There are few studies that investigate the possibility of generating synthetic tabular data in a medical context.
 
 \subsection{Aim}
-The aim of this article is to evaluate the effectiveness of using generative adversarial networks  \acrshortpl{gan} for generating synthetic tabular data in a trauma setting, and to explore the potential of this approach for improving \acrshort{ofi} prediction models.
+The aim of this article is to evaluate the effectiveness of using \acrshortpl{gan} and \acrshortpl{vae} for generating synthetic tabular data in a trauma setting, and to explore the potential of this approach for improving \acrshort{ofi} prediction models.
 
 \section{Materials and Methods}
 We conducted a retrospective study using registry data from Karolinska University Hospital, comparing the performance of supervised machine learning models that were trained with synthetic data and those that were not, by analysing all trauma patients in the trauma registry and quality database from 2014 to 2021.
