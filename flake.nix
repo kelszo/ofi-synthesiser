@@ -7,7 +7,11 @@
       url = "github:DavHau/pypi-deps-db";
       flake = false;
     };
-    mach-nix = { url = "mach-nix/3.5.0"; };
+    mach-nix = {
+      url = "mach-nix/3.5.0";
+      inputs.pypi-deps-db.follows = "pypi-deps-db";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, flake-utils, mach-nix, pypi-deps-db }:
@@ -23,7 +27,7 @@
         };
 
         pythonEnv = mach-nix.lib."${system}".mkPython {
-          python = "python39";
+          python = "python38";
           requirements = builtins.readFile ./requirements.txt;
         };
 
@@ -74,6 +78,11 @@
             pkgs.haskellPackages.pandoc-crossref
             pkgs.graphviz
           ];
+          shellHook = ''
+            echo ""
+            echo "Current python: $(which python)"
+          '';
+
         };
       });
 }
