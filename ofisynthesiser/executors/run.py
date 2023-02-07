@@ -29,7 +29,7 @@ start_time = datetime.now().strftime("%y%m%d-%H%M")
 SEED = 2023
 N_RESAMPLES = 100
 HYPEROPT_TIMEOUT = 60 * 60
-DEBUG = True
+DEBUG = False
 HYPERPARAMS_PATH = "out/230120-0149-hyperparams.pickle"
 PARALLEL = True
 
