@@ -4,9 +4,14 @@ ENV DEBIAN_FRONTEND noninteractive
 
 WORKDIR /app
 
-COPY data data
+RUN apt-get update && apt-get -y update
 
-COPY requirements.txt .
+RUN apt-get install -y \
+    graphviz \
+    swig \
+    libgl1 \
+    tini  \
+    wget 
 
 RUN pip install --no-cache-dir \
     catboost \
@@ -14,4 +19,8 @@ RUN pip install --no-cache-dir \
     optuna \
     sdv 
 
-COPY ofisynthesiser ofisynthesiser
+COPY jupyter_notebook_config.json .
+EXPOSE 6080
+ENTRYPOINT ["/usr/bin/tini", "--"]
+
+CMD ["jupyter", "notebook", "--config=./jupyter_notebook_config.json"]

@@ -14,4 +14,4 @@ podman_run:
 	podman run --name ofi-synthesiser --rm --volume=$(pwd)/out:/out localhost/ofi-synthesiser:latest 
 
 docker_run_cuda:
-	nvidia-docker run --name ofi-synthesiser -d  --gpus all --volume=$(pwd)/out:/out localhost/ofi-synthesiser:latest python -m ofisynthesiser.executors.run
+	nvidia-docker run --name ofi-synthesiser -d  --gpus all --volume=$(pwd)/ofisynthesiser:/app/ofisynthesiser --volume=$(pwd)/out:/app/out ofi-synthesiser:latest python -m ofisynthesiser.executors.run

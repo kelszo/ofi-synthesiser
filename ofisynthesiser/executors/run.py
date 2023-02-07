@@ -2,13 +2,14 @@ import os
 import pickle
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 import torch
-from tqdm import tqdm
 from joblib import Parallel, delayed
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm, trange
 
-from ofisynthesiser.data import preprocessor, target
+from ofisynthesiser.data import features, preprocessor, target
 from ofisynthesiser.models.classification import (
     SVC,
     CatBoostClassifier,
@@ -28,8 +29,9 @@ start_time = datetime.now().strftime("%y%m%d-%H%M")
 SEED = 2023
 N_RESAMPLES = 100
 HYPEROPT_TIMEOUT = 60 * 60
-DEBUG = False
+DEBUG = True
 HYPERPARAMS_PATH = "out/230120-0149-hyperparams.pickle"
+PARALLEL = True
 
 seed_everything(SEED)
 
@@ -52,6 +54,8 @@ data = data[data[target].notna()]
 data[target] = data[target].replace("No", 0)
 data[target] = data[target].replace("Yes", 1)
 
+data = data[features + [target]]
+
 best_params = {}
 
 classification_models = {
@@ -65,7 +69,11 @@ classification_models = {
     "XGBOOST": XGBClassifier,
 }
 
-synthesising_models = {"NONE": None, "CTGAN": generate_data_copula_gan, "TVAE": generate_data_tvae}
+synthesising_models = {
+    "NONE": None,
+    "CTGAN": generate_data_copula_gan,
+    "TVAE": generate_data_tvae,
+}
 
 results = []
 
@@ -88,9 +96,11 @@ def hyperopt(Model, model_name, X, y):
 
 
 if HYPERPARAMS_PATH != "":
+    logging.info("USING SAVED HYPER PARAMETERS")
     with open(HYPERPARAMS_PATH, "rb") as handle:
         best_params = pickle.load(handle)
 else:
+    logging.info("HYPER PARAMETER OPTIMISING")
     with tqdm_joblib(tqdm(total=len(classification_models))) as progress_bar:
         collected_best_params = Parallel(n_jobs=os.cpu_count())(
             delayed(hyperopt)(classification_models[model_name], model_name, X_raw, y_raw)
@@ -147,8 +157,8 @@ def resample(
         X_synth = df_synth.drop(columns=[target])
         X_synth = preprocessor.transform(X_synth)
 
-        y_comb = y_raw + y_synth
-        X_comb = X_raw + X_synth
+        y_comb = np.concatenate([y_raw, y_synth])
+        X_comb = np.concatenate([X_raw, X_synth])
 
         for model_name in classification_models:
             Model = classification_models[model_name]
@@ -163,11 +173,18 @@ def resample(
     return resample_results
 
 
-with tqdm_joblib(tqdm(total=N_RESAMPLES)) as progress_bar:
-    results = Parallel(n_jobs=os.cpu_count())(
-        delayed(resample)(data, resample_idx) for resample_idx in range(N_RESAMPLES)
-    )
+if DEBUG or not PARALLEL:
+    logging.info("NOT USING PARALLEL")
+    results = []
+    for resample_idx in trange(N_RESAMPLES):
+        results.append(resample(data, resample_idx))
+else:
+    logging.info("USING PARALLEL")
 
+    with tqdm_joblib(tqdm(total=N_RESAMPLES)) as progress_bar:
+        results = Parallel(n_jobs=os.cpu_count())(
+            delayed(resample)(data, resample_idx) for resample_idx in range(N_RESAMPLES)
+        )
 
 with open(f"out/{start_time}-results.pickle", "wb") as handle:
     pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)

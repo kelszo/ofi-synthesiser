@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  blixt:
+    restart: "no"
+    volumes:
+      - ./:/app
+
+    ports:
+      - 6080:6080
+    shm_size: "64gb"
+    build:
+      context: .
+      dockerfile: ./Containerfile
+    runtime: nvidia
