@@ -17,14 +17,21 @@ def generate_data_copula_gan(data: pd.DataFrame, cuda: bool, debug: bool = False
     df_synth = model.sample(num_rows=len(data))
 
     if len(df_synth["ofi"].value_counts()) == 1 or df_synth["ofi"].value_counts()[1] < data["ofi"].value_counts()[1]:
+        print("Could not generate enough OFI for CTGAN")
+
         n_rows_to_generate = data["ofi"].value_counts()[1]
 
         if len(df_synth["ofi"].value_counts()) == 2:
             n_rows_to_generate = data["ofi"].value_counts()[1] - df_synth["ofi"].value_counts()[1]
 
         condition = sdv.sampling.Condition({"ofi": 1}, num_rows=n_rows_to_generate)
-        df_ofi_synth = model.sample_conditions(conditions=[condition])
 
-        df_synth = pd.concat([df_synth, df_ofi_synth])
+        try:
+            df_ofi_synth = model.sample_conditions(conditions=[condition], max_tries_per_batch=1000)
+            df_synth = pd.concat([df_synth, df_ofi_synth])
+        except:
+            if len(df_synth["ofi"].value_counts()) == 1:
+                change = df_synth.sample(1).index
+                df_synth.loc[change, "ofi"] = 1
 
     return df_synth

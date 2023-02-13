@@ -31,7 +31,7 @@ N_RESAMPLES = 100
 HYPEROPT_TIMEOUT = 60 * 60
 DEBUG = False
 HYPERPARAMS_PATH = "out/230120-0149-hyperparams.pickle"
-PARALLEL = True
+PARALLEL = False
 
 seed_everything(SEED)
 
