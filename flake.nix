@@ -3,18 +3,18 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    pypi-deps-db = {
-      url = "github:DavHau/pypi-deps-db";
-      flake = false;
-    };
+    #  pypi-deps-db = {
+    #    url = "github:DavHau/pypi-deps-db";
+    #    flake = false;
+    #   };
     mach-nix = {
       url = "mach-nix/3.5.0";
-      inputs.pypi-deps-db.follows = "pypi-deps-db";
-      inputs.nixpkgs.follows = "nixpkgs";
+      #  inputs.pypi-deps-db.follows = "pypi-deps-db";
+      #   inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, mach-nix, pypi-deps-db }:
+  outputs = { self, nixpkgs, flake-utils, mach-nix, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
