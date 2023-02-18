@@ -1,4 +1,4 @@
-\documentclass[12pt, letterpaper]{article}
+\documentclass[12pt, a4paper]{article}
 \usepackage[english]{babel}
 
 % margins
@@ -6,9 +6,6 @@
 
 % include pdf
 \usepackage[final]{pdfpages}
-
-% fix titles
-\usepackage{titlesec}
 
 % fix line breaks urls
 \PassOptionsToPackage{hyphens}{url}
@@ -19,6 +16,11 @@
 % Special/larger tables
 \usepackage{longtable}
 \usepackage{tabularx}
+
+% Centered X
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+% Centered p
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 % quotes
 \usepackage{csquotes}
@@ -45,18 +47,32 @@
 \usepackage{array} % centering + width fix
 
 \usepackage{caption} 
-\captionsetup{labelfont=bf,labelsep=period,font=footnotesize,}
+\captionsetup{labelfont=bf,labelsep=period,font=small} 
 \usepackage{cleveref}
 
+% Times New Roman
+%\usepackage{newtxtext,newtxmath}
+
+% Page numbering right
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% Clear the header and footer
+\fancyhead{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+% Set the right side of the footer to be the page number
+\fancyfoot[R]{\thepage}
+
 % Fix section titles size/format
+\usepackage{titlesec}
 \titleformat{\section}
-  {\normalfont\fontsize{16}{21}\bfseries}
+  {\normalfont\fontsize{16}{19.2}\bfseries}
   {\thesection}
   {1em}
   {}
 
 \titleformat{\subsection}
-  {\normalfont\fontsize{14}{18}\bfseries}
+  {\normalfont\fontsize{14}{17}\bfseries}
   {\thesubsection}
   {1em}
   {}
@@ -147,6 +163,8 @@
 \begin{titlepage}
     \includepdf[pages=-,pagecommand={},fitpaper=true,]{title_page.pdf}
 \end{titlepage}
+\setstretch{1}
+\fontsize{11}{13}\selectfont
 
 \addcontentsline{toc}{section}{Abstract}
 
@@ -162,6 +180,8 @@
 
 \newpage
 
+\normalsize
+
 \glsaddall
 \printnoidxglossary[type=acronym,style=csuper]
 \printnoidxglossary[style=gsuper]
@@ -169,10 +189,10 @@
 \newpage
 \pagenumbering{arabic}
 
-\setstretch{1.5}
+\setstretch{1.45}
 
 \section{Introduction}
-\Gls{trauma} is a significant contributor to mortality and morbidity for people between the ages of 10 and 49 globally, and it is the leading cause of death among young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The average age of the trauma population is low and two-thirds of this group have no previous history of co-morbidity \cite{brattstrom_socio-economic_2015}. As a result, it is crucial to provide high-quality trauma care to reduce mortality and morbidity rates for this population, which has a long life expectancy. The estimated age standardised disability-adjusted life years for the population is 247.6 million, compared to the most common cause of mortality globally, ischaemic heart disease, with 170.3 million years \cite{haagsma_global_2016,wang_global_2021,roth_global_2018}.
+\Gls{trauma} is a significant contributor to mortality and morbidity for people between the ages of 10 and 49 globally, and it is the leading cause of death among young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The average age of the trauma population is low, and two-thirds of this group have no previous history of co-morbidity \cite{brattstrom_socio-economic_2015}. As a result, it is crucial to provide high-quality trauma care to reduce mortality and morbidity rates for this population, which has a long-life expectancy. The estimated age standardised disability-adjusted life years for the population is 247.6 million, compared to the most common cause of mortality globally, ischaemic heart disease, with 170.3 million years \cite{haagsma_global_2016,wang_global_2021,roth_global_2018}.
 
 One way to enhance trauma patient care is through the implementation of \acrfull{qi} programs, as recommended by the World Health Organization (WHO) \cite{world_health_organization_guidelines_2009}. These \acrshort{qi} programs have a base in the three concepts for quality assurance suggested by Donabedian - structure, process, and outcomes \cite{donabedian_effectiveness_1996}. \Acrfull{mam}  conferences are a crucial component of these programs and aim to identify \acrfull{ofi} in patient care \cite{santana_development_2014}. \acrshort{mam} conferences are conducted by representatives from all disciplines and professions involved in trauma care, during which the treatment provided to an individual patient is evaluated and compared to the optimal treatment that should have been provided. Regularly conducting these reviews is linked to a reduction in complication rates, hospital stay time, and preventable deaths, thereby providing high-quality trauma care \cite{stelfox_evidence_2011, mcdermott_trauma_1994}. The conferences aim to address all pillars suggested by Donabedian for quality assurance, however, due to their nature, \acrshort{mam} conferences are highly resource-intensive.
 
@@ -182,20 +202,21 @@ Therefore, a more advanced \acrshort{qi} technique suggested by World Health Org
 
 However, the performance of these systems is inconsistent and has been linked to high rates of false positives. Depending on the context, the frequency of false positives can range from 24\% to 80\% \cite{attergrim_predicting_2023,sanddal_analysis_2011,roy_learning_2017,ghorbani_analysis_2018}. It has been suggested to use calculated probability of survival (PS) and Trauma Score and Injury Severity Score (TRISS) as audit filters. TRISS and PS have a poor track record in detecting a substantial number of preventable deaths and miss important \acrshort{ofi} \cite{heim_survival_2016}.
 
-However, a newer approach proposed by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} recommends replacing audit filter systems with supervised \acrfull{ml} models. These newer models exhibit a significantly improved performance compared to the audit filter system currently used at Karolinska University Hospital in Stockholm, Sweden. When maintaining the same sensitivity, the false positive rate was reduced from 68\% to 53\% with the use of the same data. \acrshort{ml} in trauma has existed for some time and most studies investigate the application of \acrshort{ml} models in prediction mortality and complications \cite{zhang_machine_2022}. This is the first time that \acrshort{ml} models have been used to predict \acrshort{ofi} in trauma care.
+A newer approach proposed by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} recommends replacing audit filter systems with supervised \acrfull{ml} models. These newer models exhibit a significantly improved performance compared to the audit filter system currently used at Karolinska University Hospital in Stockholm, Sweden. When maintaining the same sensitivity, the false positive rate was reduced from 68\% to 53\% with the use of the same data. \acrshort{ml} in trauma has existed for some time and most studies investigate the application of \acrshort{ml} models in prediction mortality and complications \cite{zhang_machine_2022}. This is the first time that \acrshort{ml} models have been used to predict \acrshort{ofi} in trauma care.
 
 The models investigated by Attegrim and Szolnoky et al. include traditional \acrshort{ml} methods: logistic regression, random forest \cite{breiman_random_2001}, decision trees, support vector machines \cite{cortes_support-vector_1995}, as well as newer boosting models: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. The overall best performing model was LightGBM.
 
 Despite the improved performance, the models still have a problem in that 50\% of patient cases are inaccurately marked as \acrshort{ofi} positive. \acrshort{ml} methods generally require substantial amounts of data to perform effectively \cite{piccialli_survey_2021}. There are several ways to enhance the performance of \acrshort{ml} models, and the most basic and well-known is simply increasing the amount of data. Until now, the only option for doing so was by manually gathering more data and annotating it. This process is slow, and in some cases, not feasible due to a shortage of data.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\textwidth]{figures/gan-xray.png}
-    \caption{Example of using a \acrfull{gan} to generate chest radiograph images. Image taken from \cite{sundaram_gan-based_2021}.}
-    \label{fig:gan-xray}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.6\textwidth]{figures/gan-xray.png}
+%     \caption{Example of using a \acrfull{gan} to generate chest radiograph images. Image taken from \cite{sundaram_gan-based_2021}.}
+%     \label{fig:gan-xray}
+% \end{figure}
+% See \Cref{fig:gan-xray} for an example usage of \acrshortpl{gan} in image analysis.
 
-Recently, the use of \acrfullpl{gan} to generate synthetic data has become a popular topic in image analysis \cite{pavan_kumar_generative_2021}. See \Cref{fig:gan-xray} for an example usage of \acrshortpl{gan} in image analysis. A \acrshort{gan} is a type of artificial neural network consisting of two main components: a generator and a discriminator. The generator is trained to produce new data samples that resemble the input data, while the discriminator is trained to differentiate between the generated samples and the real data.
+Recently, the use of \acrfullpl{gan} to generate synthetic data has become a popular topic in image analysis \cite{pavan_kumar_generative_2021}.  A \acrshort{gan} is a type of artificial neural network consisting of two main components: a generator and a discriminator. The generator is trained to produce new data samples that resemble the input data, while the discriminator is trained to differentiate between the generated samples and the real data.
 
 The generator and discriminator are trained together in an adversarial manner. The generator aims to produce samples that the discriminator cannot identify as fake, while the discriminator strives to accurately identify the fake samples generated by the generator. This process allows the generator to learn to produce samples that resemble the input data, and the discriminator to learn to distinguish between real and generated data. As a result, the generator continually improves, producing data that more closely resembles the source and becomes increasingly difficult for the discriminator to identify as synthetic data.
 
@@ -239,7 +260,7 @@ All model development and data preprocessing was carried out in Python. The mode
 A preprocessor was developed to preprocess both the training and test data without any data leakage. This was achieved by transforming continuous features using Yeo-Johnson's power transformation \cite{yeo_new_2000} and encoding nominal features using one-hot encoding. Ordinal features remained unchanged. Continuous features were imputed using the mean of the feature, ordinal features using the most frequent value, and nominal features using an "unknown" category. An exception was made for blood pressure and respiratory rate in the pre-hospital and emergency department, which were imputed using the mean value of the revised trauma score category \cite{ringdal_utstein_2008} if it existed. The preprocessor was trained on the training data and then applied to the test data, ensuring no data leakage between the test and training sets.
 
 \subsubsection*{Classification models}
-As suggested by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023}, the following traditional methods were implemented using scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, ensemble of decision trees, support vector machine, and k-nearest neighbor. The following boosting methods were implemented using their respective Python implementations: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was performed on all models using the first resampled training data, with a 5-fold cross-validation. The suggested parameters found in the source or implementation documentation were optimized using Tree-structured Parzen Estimator \cite{bergstra_algorithms_2011} for a total of 1 hour per model.
+As suggested by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023}, the following traditional methods were implemented using scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, ensemble of decision trees, support vector machine, and k-nearest neighbor. The following boosting methods were implemented using their respective Python implementations: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was performed on all models using the first resampled training data, with a 5-fold cross-validation. The suggested parameters found in the documentation were optimized using Tree-structured Parzen Estimator \cite{bergstra_algorithms_2011} for a total of 1 hour per model.
 
 \subsubsection*{Synthesising models}
 The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} models were implemented with the assistance of the Synthetic Data Vault framework \cite{patki_sdv_2016} in Python. The batch size was increased to 1000 samples to incorporate a higher number of minority cases in a single batch. The number of epochs trained was increased to 600. The standard parameters provided were otherwise used.
@@ -248,7 +269,10 @@ The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{figures/model_flowchart.pdf}
-    \caption{Flowchart describing the process of evaluating the synthesising models. Process is replicated for each classification model and resample. Each arrow to "Train Classification Model" indicates an individual and separated training/evaluation cycle from the other data inputs. *Synthetic training data output by a data synthesising model.\\ \textit{Definition of abbreviations:} CTGAN = Conditional tabular generative adversarial network; TVAE = Triplet based variational autoencoder.}
+    \caption{\textbf{Flowchart describing the process of evaluating the synthesising models.}\\
+        Process is replicated for each classification model and resample. Each arrow to "Train Classification Model" indicates an individual and separated training/evaluation cycle from the other data inputs.\\
+        *Synthetic training data output by a data synthesising model.\\
+        \textit{Definition of abbreviations:} CTGAN = Conditional tabular generative adversarial network; TVAE = Triplet based variational autoencoder.}
     \label{fig:modelflowchart}
 \end{figure}
 
@@ -262,22 +286,23 @@ The performance of the models was assessed on the test split from each resample 
 Descriptive statistics, including mean, \acrfull{sd}, median, minimum, and maximum for continuous features, and prevalence for categorical features, were calculated. Descriptive statistics were computed for both the baseline and synthetic datasets.
 
 \subsection{Ethical Considerations}
-The group under investigation in this study, trauma patients, can be considered a vulnerable population due to the severe outcomes that often result from major trauma, such as disability and death. Thus, special consideration must be given to the ethics of conducting this study. It is important to note that only anonymous registry data was used in this study, and no identifiable personal data was accessible by the authors or the \acrshort{ml} models.
+The group under investigation in this study, trauma patients, can be considered a vulnerable population due to the severe outcomes that often result from major trauma, such as disability and death. Thus, special consideration must be given to the ethics of conducting this study. It is important to note that only anonymous registry data was used in this study, and no identifiable personal data was accessible by the authors or the \acrshort{ml} models, this is one of the important measurements taken to reduce possible ethical complications.
 
 In terms of autonomy and non-maleficence, no interventions were made that could potentially harm the patients. The registry on which this study was based, \acrshort{swetrau}, operates under the assumption of presumed consent, meaning that if a patient does not explicitly opt out of being included in the registry, it is assumed that they have consented to participate. While this study poses almost no risk of harm to the study population, the absence of sensitive personal data also reduces the risk of stigmatising a particular group.
 
 The study aligns with the principle of beneficence, as its purpose is to improve clinical models for detecting \acrshortpl{ofi} and improve patient care in the long run. The study provides valuable insights into methods to improve the performance of \acrshort{ml} models in this area.
 
-The ethical considerations associated with synthesising personal data warrant further discussion. If it were possible to generate 100\% anonymous synthesised data, would the same ethical principles apply? Since the synthesised data does not represent actual patients, it is difficult to consider autonomy and justice in this context. However, conducting epidemiological studies on randomly generated or simulated data is typically done without much ethical consideration. There needs to be a consensus on these ethical considerations before synthesising models are able to produce highly accurate synthetic data.
+The ethical considerations associated with synthesising personal data warrant further discussion. If it were possible to generate 100\% anonymous synthesised data, would the same ethical principles apply? Since the synthesised data does not represent actual patients, it is difficult to consider autonomy and justice in this context. However, conducting epidemiological studies on randomly generated or simulated data is typically done without much ethical consideration. There must be a consensus on these ethical considerations before synthesising models can produce highly accurate synthetic data.
 
 In conclusion, the benefits of this study, as measured against the four principles of Beauchamp and Childress (autonomy, non-maleficence, descence, and justice), outweigh the potential risks. The study was approved by the Stockholm Research Ethics Review Board (permits 2021-02541 and 2021-03531).
 
 \section{Results}
 \subsection{Patient Characteristics}
-\begin{figure}[t]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/flowchart.pdf}
-    \caption{Flowchart describing the exclusions made and including the process to determine a case with \acrshort{ofi}. *Defined at 30-days post trauma. \\
+    \caption{\textbf{Flowchart describing the exclusions made and including the process to determine a case with \acrshort{ofi}.}\\
+        *Defined at 30-days post trauma.\\
         \textit{Definition of abbreviations:} OFI = opportunity for improvement.}
     \label{fig:flowchart}
 \end{figure}
@@ -286,9 +311,10 @@ During the years 2014 to 2021, a population of \num{12107} trauma patients were 
 \begin{table}[t!]
     \centering
     \renewcommand{\arraystretch}{0.9}
-    \caption{Patient demographic and clinical characteristics subdivided by \acrshort{ofi} outcome for ground truth data.}
+    \caption{\textbf{Patient demographic and clinical characteristics}.\\
+        Subdivided by \acrshort{ofi} outcome for ground truth data.}
     \label{tab:tableone}
-    \scalebox{0.6}{
+    \scalebox{0.7}{
         \begin{tabular}{lccc}
             \toprule
                                                           & \textbf{Overall}  & \textbf{No OFI}   & \textbf{OFI}     \\
@@ -354,15 +380,46 @@ During the years 2014 to 2021, a population of \num{12107} trauma patients were 
             \bottomrule
         \end{tabular}
     }
-    \caption*{\scriptsize Time to first CT and Time to definitive treatment are measured in minutes from arrival at the hospital.\\
+    \caption*{\small Time to first CT and Time to definitive treatment are measured in minutes from arrival at the hospital.\\
         \textit{Definition of abbreviations:} OFI = Opportunity for Improvement; ED = Emergency Department; GCS = Glascow Coma Scale.}
 \end{table}
 
 Selected patient characteristics are summarised in \Cref{tab:tableone}. The trauma group as a whole had a mean age of 46 (\acrshort{sd}: 21) while the \acrshort{ofi} and \acrshort{ofi} negative subgroup had a mean age of 50 (\acrshort{sd}: 22) and 45 (\acrshort{sd}: 21) respectively. The majority were male ($n = $ \num{3509}, 61\%) and the overall group had a mortality of 6\% ($n = $ \num{331}). The \acrshort{ofi} group had a higher mean \acrshort{iss} (18 [\acrshort{sd}: 10] vs 10 [\acrshort{sd}: 11]) and were admitted to the intensive care unit more frequently (30\% [$n = $ \num{286}] vs 14\% [$n = $ \num{761}]). Data for emergency procedure was less missing in the \acrshort{ofi} subgroup with 54\% ($n = $ 182) of records missing data compared to 82\% ($n = $ \num{4452}) in the \acrshort{ofi} negative group. Furthermore, the emergency procedure "other" was more common in the \acrshort{ofi} group (26\% [$n = $ \num{88}] vs 13\% [$n = $ \num{699}]).
 
-Selected patient characteristics for the data produced by the synthesising models are presented in \Cref{tab:ctgandata, tab:tvaedata} in the appendix.
+Selected patient characteristics for the data produced by the synthesising models are presented in \Cref{tab:tableonectgan,tab:tableonetvae} in the appendix.
 
 \subsection{Model Performance}
+\begin{table}[ht!]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \caption{\textbf{Model performances}.}
+    \label{tab:modelperf}
+    \scalebox{0.75}{
+        \begin{tabular}{lP{3cm}P{3cm}P{3cm}P{3cm}P{3cm}}
+            \toprule
+            Model               & Baseline                             & CTGAN                       & TVAE                        & CTGAN + Baseline                     & TVAE + Baseline             \\
+            \midrule
+            CatBoost            & \textbf{0.789\newline(0.784, 0.794)} & 0.573\newline(0.551, 0.579) & 0.681\newline(0.615, 0.659) & 0.775\newline(0.772, 0.782)          & 0.779\newline(0.771, 0.781) \\\hline
+            Extra Trees         & \textbf{0.775\newline(0.771, 0.781)} & 0.611\newline(0.586, 0.611) & 0.596\newline(0.585, 0.622) & 0.763\newline(0.757, 0.768)          & 0.763\newline(0.76, 0.77)   \\\hline
+            k-NN                & 0.715\newline(0.71, 0.721)           & 0.541\newline(0.52, 0.545)  & 0.521\newline(0.521, 0.533) & \textbf{0.718\newline(0.711, 0.722)} & 0.686\newline(0.682, 0.695) \\\hline
+            LightGBM            & \textbf{0.78\newline(0.778, 0.788)}  & 0.548\newline(0.537, 0.56)  & 0.627\newline(0.587, 0.62)  & 0.769\newline(0.767, 0.776)          & 0.773\newline(0.766, 0.777) \\\hline
+            Logistic Regression & \textbf{0.768\newline(0.759, 0.769)} & 0.595\newline(0.58, 0.609)  & 0.669\newline(0.592, 0.643) & 0.747\newline(0.742, 0.754)          & 0.752\newline(0.745, 0.756) \\\hline
+            Random forest       & \textbf{0.792\newline(0.787, 0.797)} & 0.638\newline(0.619, 0.639) & 0.643\newline(0.603, 0.636) & 0.783\newline(0.779, 0.788)          & 0.779\newline(0.772, 0.783) \\\hline
+            SVM                 & \textbf{0.679\newline(0.668, 0.681)} & 0.508\newline(0.489, 0.514) & 0.66\newline(0.593, 0.64)   & 0.387\newline(0.424, 0.474)          & 0.648\newline(0.641, 0.655) \\\hline
+            XGBoost             & \textbf{0.77\newline(0.767, 0.776)}  & 0.578\newline(0.559, 0.588) & 0.697\newline(0.602, 0.657) & 0.749\newline(0.743, 0.754)          & 0.744\newline(0.739, 0.751) \\
+            \bottomrule
+        \end{tabular}
+    }
+\end{table}
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/roc.pdf}
+    \caption{\textbf{Receiver operating characteristic curve for synthesising models.}\\
+        *Defined at 30-days post trauma.\\
+        \textit{Definition of abbreviations:} AUC = \Acrlong{auc}; CTGAN = \Acrlong{ctgan}; TVAE = \Acrlong{tvae}.}
+    \label{fig:flowchart}
+\end{figure}
 
 
 \section{Discussion}
@@ -395,7 +452,7 @@ Selected patient characteristics for the data produced by the synthesising model
         \centering
         \renewcommand{\arraystretch}{1.2}
 
-        \caption{All the currently used audit filters at Karolinska University Hospital.}
+        \caption{\textbf{All the currently used audit filters at Karolinska University Hospital.}}
         \label{tab:auditfilters}
 
         \begin{tabular}{@{}|p{0.85\linewidth}|@{}}
@@ -417,7 +474,7 @@ Selected patient characteristics for the data produced by the synthesising model
 
     \renewcommand*{\arraystretch}{1.2}
     \begin{longtable}[c]{@{}|l|p{0.55\linewidth}|@{}}
-        \caption{Predictors used in the development of the \acrlong{ofi} classification and synthesising models. \textit{Definition of abbreviations:} CT = Computer Tomography; DT = Delta Time; ED = Emergency department; GCS = Glascow Coma Scale; PH = Pre-hospital.}%
+        \caption{\textbf{Predictors used in the development of the \acrlong{ofi} classification and synthesising models.}}%
         \label{tab:predictors}                                                                                          \\
         \hline
         \multicolumn{1}{|c|}{\textbf{SweTrau code}} & \multicolumn{1}{|c|}{\textbf{Description}}                        \\\hline
@@ -475,7 +532,174 @@ Selected patient characteristics for the data produced by the synthesising model
         pt\_asa\_preinjury                          & American Society of Anesthesiologists Class pre-injury            \\\hline
         res\_gos\_dischg                            & Glascow outcome score at discharge                                \\\hline
         res\_survival                               & Mortality                                                         \\\hline
+        \caption*{\small \textit{Definition of abbreviations:} CT = Computer Tomography; DT = Delta Time; ED = Emergency department; GCS = Glascow Coma Scale; PH = Pre-hospital.}%
     \end{longtable}
+
+    \begin{table}[t!]
+        \centering
+        \renewcommand{\arraystretch}{0.9}
+        \caption{\textbf{Patient demographic and clinical characteristics}.\\
+            Subdivided by \acrshort{ofi} outcome for \acrshort{ctgan} data.}
+        \label{tab:tableonectgan}
+        \scalebox{0.7}{
+            \begin{tabular}{lccc}
+                \toprule
+                                                              & \textbf{Overall}  & \textbf{No OFI}   & \textbf{OFI}     \\
+                \midrule
+                                                              & $n=5793$          & $n=5293$          & $n=500$          \\
+                \textbf{Age}                                  &                   &                   &                  \\
+                \hspace{3mm}Mean (SD)                         & 56 (23)           & 56 (23)           & 55 (23)          \\
+                \hspace{3mm}Median [Min, Max]                 & 56 [15, 100]      & 56 [15, 100]      & 53 [15, 100]     \\
+                \hspace{3mm}Missing                           & 2112 (36\%)       & 1847 (35\%)       & 265 (53\%)       \\
+                \textbf{Gender}                               &                   &                   &                  \\
+                \hspace{3mm}Female                            & 1566 (27\%)       & 1465 (28\%)       & 101 (20\%)       \\
+                \hspace{3mm}Male                              & 2122 (37\%)       & 1988 (38\%)       & 134 (27\%)       \\
+                \hspace{3mm}Missing                           & 2105 (36\%)       & 1840 (35\%)       & 265 (53\%)       \\
+                \textbf{Dead at 30 days}                      &                   &                   &                  \\
+                \hspace{3mm}No                                & 3577 (62\%)       & 3350 (63\%)       & 227 (45\%)       \\
+                \hspace{3mm}Yes                               & 121 (2\%)         & 113 (2\%)         & 8 (2\%)          \\
+                \hspace{3mm}Missing                           & 2095 (36\%)       & 1830 (35\%)       & 265 (53\%)       \\
+                \textbf{Highest level of care}                &                   &                   &                  \\
+                \hspace{3mm}General ward                      & 2041 (35\%)       & 1928 (36\%)       & 113 (23\%)       \\
+                \hspace{3mm}Intensive care unit               & 842 (15\%)        & 780 (15\%)        & 62 (12\%)        \\
+                \hspace{3mm}ED                                & 410 (7\%)         & 385 (7\%)         & 25 (5\%)         \\
+                \hspace{3mm}Surgical ward                     & 334 (6\%)         & 305 (6\%)         & 29 (6\%)         \\
+                \hspace{3mm}Specialist/Intermediate ward      & 67 (1\%)          & 62 (1\%)          & 5 (1\%)          \\
+                \hspace{3mm}Missing                           & 2099 (36\%)       & 1833 (35\%)       & 266 (53\%)       \\
+                \textbf{Injury severity score}                &                   &                   &                  \\
+                \hspace{3mm}Mean (SD)                         & 7 (9)             & 7 (9)             & 8 (9)            \\
+                \hspace{3mm}Median [Min, Max]                 & 5 [0, 75]         & 5 [0, 75]         & 8 [0, 74]        \\
+                \hspace{3mm}Missing                           & 2116 (37\%)       & 1851 (35\%)       & 265 (53\%)       \\
+                \textbf{ED Respiratory Rate}                  &                   &                   &                  \\
+                \hspace{3mm}Mean (SD)                         & 27 (24)           & 27 (23)           & 28 (24)          \\
+                \hspace{3mm}Median [Min, Max]                 & 21 [4, 99]        & 21 [4, 99]        & 22 [6, 99]       \\
+                \hspace{3mm}Missing                           & 2311 (40\%)       & 2025 (38\%)       & 286 (57\%)       \\
+                \textbf{ED Systolic blood pressure}           &                   &                   &                  \\
+                \hspace{3mm}Mean (SD)                         & 148 (36)          & 148 (36)          & 141 (35)         \\
+                \hspace{3mm}Median [Min, Max]                 & 143 [0, 285]      & 143 [0, 285]      & 138 [0, 274]     \\
+                \hspace{3mm}Missing                           & 2238 (39\%)       & 1960 (37\%)       & 278 (56\%)       \\
+                \textbf{ED GCS}                               &                   &                   &                  \\
+                \hspace{3mm}Mean (SD)                         & 21 (32)           & 21 (32)           & 22 (24)          \\
+                \hspace{3mm}Median [Min, Max]                 & 15 [3, 999]       & 15 [3, 999]       & 15 [3, 121]      \\
+                \hspace{3mm}Missing                           & 2102 (36\%)       & 1839 (35\%)       & 263 (53\%)       \\
+                \textbf{Time to first CT}                     &                   &                   &                  \\
+                \hspace{3mm}Mean (SD)                         & 51 (80)           & 50 (79)           & 58 (91)          \\
+                \hspace{3mm}Median [Min, Max]                 & 29 [0, 1033]      & 29 [0, 1033]      & 34 [2, 750]      \\
+                \hspace{3mm}Missing                           & 2477 (43\%)       & 2167 (41\%)       & 310 (62\%)       \\
+                \textbf{Time to definitive treatment}         &                   &                   &                  \\
+                \hspace{3mm}Mean (SD)                         & 314 (294)         & 317 (298)         & 285 (245)        \\
+                \hspace{3mm}Median [Min, Max]                 & 267 [1, 1727]     & 267 [1, 1727]     & 266 [18, 1311]   \\
+                \hspace{3mm}Missing                           & 4925 (85\%)       & 4490 (85\%)       & 435 (87\%)       \\
+                \textbf{Intubated}                            &                   &                   &                  \\
+                \hspace{3mm}No                                & 5490 (95\%)       & 5025 (95\%)       & 465 (93\%)       \\
+                \hspace{3mm}Yes                               & 303 (5\%)         & 268 (5\%)         & 35 (7\%)         \\
+                \hspace{3mm}Missing                           & 0 (0\%)           & 0 (0\%)           & 0 (0\%)          \\
+                \textbf{Emergency procedure}                  &                   &                   &                  \\
+                \hspace{3mm}Laparotomy                        & 242 (4\%)         & 225 (4\%)         & 17 (3\%)         \\
+                \hspace{3mm}Thoracotomy                       & 134 (2\%)         & 117 (2\%)         & 17 (3\%)         \\
+                \hspace{3mm}Other                             & 32 (\textless1\%) & 32 (\textless1\%) & 0 (0\%)          \\
+                \hspace{3mm}Pelvis packing                    & 117 (2\%)         & 111 (2\%)         & 6 (1\%)          \\
+                \hspace{3mm}Radiological intervention         & 68 (1\%)          & 66 (1\%)          & 2 (\textless1\%) \\
+                \hspace{3mm}Intracranial pressure measurement & 48 (\textless1\%) & 44 (\textless1\%) & 4 (\textless1\%) \\
+                \hspace{3mm}Craniotomy                        & 44 (\textless1\%) & 39 (\textless1\%) & 5 (1\%)          \\
+                \hspace{3mm}Revascularisation                 & 83 (1\%)          & 79 (1\%)          & 4 (\textless1\%) \\
+                \hspace{3mm}Missing                           & 5025 (87\%)       & 4580 (87\%)       & 445 (89\%)       \\
+                \bottomrule
+            \end{tabular}
+        }
+        \caption*{\small Time to first CT and Time to definitive treatment are measured in minutes from arrival at the hospital.\\
+            \textit{Definition of abbreviations:} OFI = Opportunity for Improvement; ED = Emergency Department; GCS = Glascow Coma Scale.}
+    \end{table}
+
+    \begin{table}[t!]
+        \centering
+        \renewcommand{\arraystretch}{0.9}
+        \caption{\textbf{Patient demographic and clinical characteristics}.\\
+            Subdivided by \acrshort{ofi} outcome for \acrshort{tvae} data.}
+        \label{tab:tableonetvae}
+        \scalebox{0.7}{
+            \begin{tabular}{lccc}
+                \toprule
+                                                              & \textbf{Overall}  & \textbf{No OFI}   & \textbf{OFI}  \\
+                \midrule
+                                                              & $n=5894$          & $n=5793$          & $n=101$       \\
+                \textbf{Age}                                  &                   &                   &               \\
+                \hspace{3mm}Mean (SD)                         & 51 (26)           & 51 (26)           & 50 (20)       \\
+                \hspace{3mm}Median [Min, Max]                 & 47 [15, 100]      & 47 [15, 100]      & 47 [15, 92]   \\
+                \hspace{3mm}Missing                           & 360 (6\%)         & 360 (6\%)         & 0 (0\%)       \\
+                \textbf{Gender}                               &                   &                   &               \\
+                \hspace{3mm}Male                              & 4808 (82\%)       & 4707 (81\%)       & 101 (100\%)   \\
+                \hspace{3mm}Female                            & 727 (12\%)        & 727 (13\%)        & 0 (0\%)       \\
+                \hspace{3mm}Missing                           & 359 (6\%)         & 359 (6\%)         & 0 (0\%)       \\
+                \textbf{Dead at 30 days}                      &                   &                   &               \\
+                \hspace{3mm}No                                & 5224 (89\%)       & 5128 (89\%)       & 96 (95\%)     \\
+                \hspace{3mm}Yes                               & 311 (5\%)         & 306 (5\%)         & 5 (5\%)       \\
+                \hspace{3mm}Missing                           & 359 (6\%)         & 359 (6\%)         & 0 (0\%)       \\
+                \textbf{Highest level of care}                &                   &                   &               \\
+                \hspace{3mm}Intensive care unit               & 1416 (24\%)       & 1321 (23\%)       & 95 (94\%)     \\
+                \hspace{3mm}General ward                      & 2099 (36\%)       & 2099 (36\%)       & 0 (0\%)       \\
+                \hspace{3mm}Surgical ward                     & 1120 (19\%)       & 1114 (19\%)       & 6 (6\%)       \\
+                \hspace{3mm}ED                                & 883 (15\%)        & 883 (15\%)        & 0 (0\%)       \\
+                \hspace{3mm}Specialist/Intermediate ward      & 14 (\textless1\%) & 14 (\textless1\%) & 0 (0\%)       \\
+                \hspace{3mm}Missing                           & 362 (6\%)         & 362 (6\%)         & 0 (0\%)       \\
+                \textbf{Injury severity score}                &                   &                   &               \\
+                \hspace{3mm}Mean (SD)                         & 11 (10)           & 10 (10)           & 32 (7)        \\
+                \hspace{3mm}Median [Min, Max]                 & 9 [0, 71]         & 9 [0, 71]         & 32 [10, 45]   \\
+                \hspace{3mm}Missing                           & 366 (6\%)         & 366 (6\%)         & 0 (0\%)       \\
+                \textbf{ED Respiratory Rate}                  &                   &                   &               \\
+                \hspace{3mm}Mean (SD)                         & 24 (20)           & 24 (21)           & 22 (3)        \\
+                \hspace{3mm}Median [Min, Max]                 & 18 [5, 99]        & 18 [5, 99]        & 23 [14, 25]   \\
+                \hspace{3mm}Missing                           & 896 (15\%)        & 878 (15\%)        & 18 (18\%)     \\
+                \textbf{ED Systolic blood pressure}           &                   &                   &               \\
+                \hspace{3mm}Mean (SD)                         & 139 (21)          & 139 (21)          & 125 (31)      \\
+                \hspace{3mm}Median [Min, Max]                 & 143 [0, 222]      & 143 [0, 222]      & 129 [54, 173] \\
+                \hspace{3mm}Missing                           & 451 (8\%)         & 447 (8\%)         & 4 (4\%)       \\
+                \textbf{ED GCS}                               &                   &                   &               \\
+                \hspace{3mm}Mean (SD)                         & 20 (20)           & 20 (20)           & 14 (2)        \\
+                \hspace{3mm}Median [Min, Max]                 & 15 [3, 105]       & 15 [3, 105]       & 14 [5, 16]    \\
+                \hspace{3mm}Missing                           & 362 (6\%)         & 362 (6\%)         & 0 (0\%)       \\
+                \textbf{Time to first CT}                     &                   &                   &               \\
+                \hspace{3mm}Mean (SD)                         & 45 (32)           & 45 (31)           & 54 (48)       \\
+                \hspace{3mm}Median [Min, Max]                 & 33 [0, 330]       & 32 [0, 330]       & 39 [15, 282]  \\
+                \hspace{3mm}Missing                           & 1050 (18\%)       & 1050 (18\%)       & 0 (0\%)       \\
+                \textbf{Time to definitive treatment}         &                   &                   &               \\
+                \hspace{3mm}Mean (SD)                         & 244 (343)         & 256 (351)         & 67 (20)       \\
+                \hspace{3mm}Median [Min, Max]                 & 84 [0, 1393]      & 87 [0, 1393]      & 65 [27, 119]  \\
+                \hspace{3mm}Missing                           & 4294 (73\%)       & 4294 (74\%)       & 0 (0\%)       \\
+                \textbf{Intubated}                            &                   &                   &               \\
+                \hspace{3mm}No                                & 5269 (89\%)       & 5264 (91\%)       & 5 (5\%)       \\
+                \hspace{3mm}Yes                               & 625 (11\%)        & 529 (9\%)         & 96 (95\%)     \\
+                \hspace{3mm}Missing                           & 0 (0\%)           & 0 (0\%)           & 0 (0\%)       \\
+                \textbf{Emergency procedure}                  &                   &                   &               \\
+                \hspace{3mm}Other                             & 462 (8\%)         & 430 (7\%)         & 32 (32\%)     \\
+                \hspace{3mm}Intracranial pressure measurement & 606 (10\%)        & 584 (10\%)        & 22 (22\%)     \\
+                \hspace{3mm}Radiological intervention         & 52 (\textless1\%) & 52 (\textless1\%) & 0 (0\%)       \\
+                \hspace{3mm}Craniotomy                        & 309 (5\%)         & 299 (5\%)         & 10 (10\%)     \\
+                \hspace{3mm}Revascularisation                 & 6 (\textless1\%)  & 6 (\textless1\%)  & 0 (0\%)       \\
+                \hspace{3mm}Missing                           & 4459 (76\%)       & 4422 (76\%)       & 37 (37\%)     \\
+                \bottomrule
+            \end{tabular}
+        }
+        \caption*{\small Time to first CT and Time to definitive treatment are measured in minutes from arrival at the hospital.\\
+            \textit{Definition of abbreviations:} OFI = Opportunity for Improvement; ED = Emergency Department; GCS = Glascow Coma Scale.}
+    \end{table}
 \end{appendices}
+
+\section*{Projektredogörelse}
+\setstretch{1.45}
+
+\subsection{B)}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/gant.png}
+\end{figure}
+
+Projektet har flytit på bra, all data var redan färdig insamlad innan jag börja. I dagsläget, som det ses i texten, är den deskreptiva analysen på populationen klar. Modellerna (både klassifikation och syntes modellerna) håller på byggas. Det antas att de kommer ta ungefär 3 dagar att köra alla modeller.
+
+Jag tänker presentera den deskreptiva analysen såsom det syns ovan. Huvud resultaten kommer presenteras i tabeller, en tabell för rena prestandan och seperata tabeller för alla delta värden. Möjligtvis att ROC kurvor kommer skapas. Hela metoden är klar och står ovan i texten.
+
+\subsection{C)}
+Min reservplan är att testa metoderna på simplare modeller som jag har använt innan och vet funkar. Klassifikationsmodellerna vet vi funkar sedan innan. Det som kan strulas är syntesmodellerna då de är tyngre och har inte använts inom gruppen innan. Vi kan använda äldre syntesmodellern, t.ex. Synthetic Minority Over-sampling Technique (SMOTE) och Adaptive Synthetic (ADASYN). Dessa används inte i uppsatsen nu då de inte kan generera helt ny data och därmed klassifieras inte som en äkta "syntesmodell". Jag tror ej detta kommer behövas då preliminär resultat visar att vi kommer få resultat och att allt går enligt planen.
 
 \end{document}
