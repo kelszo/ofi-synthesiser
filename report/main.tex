@@ -7,10 +7,6 @@
 % include pdf
 \usepackage[final]{pdfpages}
 
-% fix line breaks urls
-\PassOptionsToPackage{hyphens}{url}
-\usepackage[hidelinks]{hyperref}
-
 \usepackage{graphics}
 
 % Special/larger tables
@@ -45,10 +41,10 @@
 % tables
 \usepackage{booktabs}
 \usepackage{array} % centering + width fix
+\usepackage{multirow} % use multi rows/columns
 
 \usepackage{caption} 
-\captionsetup{labelfont=bf,labelsep=period,font=small} 
-\usepackage{cleveref}
+\captionsetup{labelfont=bf,labelsep=period,font=small,justification=raggedright,singlelinecheck=false} 
 
 % Times New Roman
 %\usepackage{newtxtext,newtxmath}
@@ -89,6 +85,13 @@
 
 % Remove section numbers
 \setcounter{secnumdepth}{0}
+
+% fix line breaks urls
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+
+\usepackage{url}
+\usepackage{cleveref}
 
 % Set paragraph spacing
 \setlength{\parindent}{0pt}
@@ -156,6 +159,9 @@
 \input{vancouver.tex} %imports biblatex 
 \addbibresource{main.bib}
 
+\author{Kelvin Szolnoky}
+\title{Synthetic Data Generation to Improve Opportunity for Improvement Prediction Model Performance - A Registry Based Study in Trauma Patient Care}
+
 
 \begin{document}
 \pagenumbering{Roman}
@@ -168,11 +174,11 @@
 
 \addcontentsline{toc}{section}{Abstract}
 
-\textbf{Titel}
+\textbf{Syntetisk data generation för att förbättra möjligheter till förbättrings prediktions modeller - en register baserad studie inom trauma vård}
 
 \vfill
 
-\textbf{Title}
+\textbf{Synthetic Data Generation to Improve Opportunity for Improvement Prediction Model Performance - A Registry Based Study in Trauma Patient Care}
 
 \vfill
 
@@ -192,7 +198,7 @@
 \setstretch{1.45}
 
 \section{Introduction}
-\Gls{trauma} is a significant contributor to mortality and morbidity for people between the ages of 10 and 49 globally, and it is the leading cause of death among young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The average age of the trauma population is low, and two-thirds of this group have no previous history of co-morbidity \cite{brattstrom_socio-economic_2015}. As a result, it is crucial to provide high-quality trauma care to reduce mortality and morbidity rates for this population, which has a long-life expectancy. The estimated age standardised disability-adjusted life years for the population is 247.6 million, compared to the most common cause of mortality globally, ischaemic heart disease, with 170.3 million years \cite{haagsma_global_2016,wang_global_2021,roth_global_2018}.
+\Gls{trauma} is a significant contributor to mortality and morbidity for people between the ages of 10 and 49 globally, and it is the leading cause of death among young people in Sweden \cite{roth_global_2018, vos_global_2020, sos_death_2021}. The average age of the trauma population is low, and two-thirds of this group have no previous history of co-morbidity \cite{brattstrom_socio-economic_2015}. The estimated age standardised disability-adjusted life years (DALY) for the trauma population is 247.6 million \cite{haagsma_global_2016}. In comparison, the most common cause of mortality globally, ischaemic heart disease, has a DALY of 170.3 million years \cite{wang_global_2021,roth_global_2018}. As a result, it is crucial to provide high-quality trauma care to reduce mortality and morbidity rates for this population, which has a long-life expectancy.
 
 One way to enhance trauma patient care is through the implementation of \acrfull{qi} programs, as recommended by the World Health Organization (WHO) \cite{world_health_organization_guidelines_2009}. These \acrshort{qi} programs have a base in the three concepts for quality assurance suggested by Donabedian - structure, process, and outcomes \cite{donabedian_effectiveness_1996}. \Acrfull{mam}  conferences are a crucial component of these programs and aim to identify \acrfull{ofi} in patient care \cite{santana_development_2014}. \acrshort{mam} conferences are conducted by representatives from all disciplines and professions involved in trauma care, during which the treatment provided to an individual patient is evaluated and compared to the optimal treatment that should have been provided. Regularly conducting these reviews is linked to a reduction in complication rates, hospital stay time, and preventable deaths, thereby providing high-quality trauma care \cite{stelfox_evidence_2011, mcdermott_trauma_1994}. The conferences aim to address all pillars suggested by Donabedian for quality assurance, however, due to their nature, \acrshort{mam} conferences are highly resource-intensive.
 
@@ -202,26 +208,38 @@ Therefore, a more advanced \acrshort{qi} technique suggested by World Health Org
 
 However, the performance of these systems is inconsistent and has been linked to high rates of false positives. Depending on the context, the frequency of false positives can range from 24\% to 80\% \cite{attergrim_predicting_2023,sanddal_analysis_2011,roy_learning_2017,ghorbani_analysis_2018}. It has been suggested to use calculated probability of survival (PS) and Trauma Score and Injury Severity Score (TRISS) as audit filters. TRISS and PS have a poor track record in detecting a substantial number of preventable deaths and miss important \acrshort{ofi} \cite{heim_survival_2016}.
 
-A newer approach proposed by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023} recommends replacing audit filter systems with supervised \acrfull{ml} models. These newer models exhibit a significantly improved performance compared to the audit filter system currently used at Karolinska University Hospital in Stockholm, Sweden. When maintaining the same sensitivity, the false positive rate was reduced from 68\% to 53\% with the use of the same data. \acrshort{ml} in trauma has existed for some time and most studies investigate the application of \acrshort{ml} models in prediction mortality and complications \cite{zhang_machine_2022}. This is the first time that \acrshort{ml} models have been used to predict \acrshort{ofi} in trauma care.
+A newer approach proposed by Attergrim et al. \cite{attergrim_predicting_2023} recommends replacing audit filter systems with supervised \acrfull{ml} models. \acrshort{ml} is a subfield of artificial intelligence that involves the use of algorithms and statistical models to enable computers to improve their performance on a specific task based on data input \cite{}. In medicine, \acrshort{ml} can be used to analyse large amounts of data and identify patterns and relationships that may be difficult or impossible for humans to discern.
 
-The models investigated by Attegrim and Szolnoky et al. include traditional \acrshort{ml} methods: logistic regression, random forest \cite{breiman_random_2001}, decision trees, support vector machines \cite{cortes_support-vector_1995}, as well as newer boosting models: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. The overall best performing model was LightGBM.
+Attergrim and colleagues used \acrshort{ml} algorithms to analyse a trauma registry including data about demographics, clinical parameters, injury type and severity, treatment outcomes, and occurring \acrshortpl{ofi}. By analysing this data, \acrshort{ml} algorithms could identify patterns and relationships that was not be immediately apparent to humans, and thus the currently used audit filters. The models could successfully find opportunities for improvement in trauma patient care. This is the first time that \acrshort{ml} models have been used to predict \acrshort{ofi} in trauma care. \cite{attergrim_predicting_2023}
+
+These newer \acrshort{ml} models, developed by Attergrim and colleagues, exhibit a significantly improved performance compared to the audit filter system currently used at Karolinska University Hospital in Stockholm, Sweden. When maintaining the same sensitivity, the false positive rate was reduced from 68\% to 53\% with the use of the same data. \acrshort{ml} in trauma has existed for some time and most studies investigate the application of \acrshort{ml} models in prediction mortality and complications \cite{zhang_machine_2022}.
+
+The models investigated by Attergrim et al. include traditional \acrshort{ml} methods: logistic regression, random forest \cite{breiman_random_2001}, decision trees, support vector machines \cite{cortes_support-vector_1995}, as well as newer boosting models: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. These are general purpose \acrshort{ml} models that were specifically trained on registry data to be able to identify \acrshort{ofi} in trauma patient care. The overall best performing model was LightGBM.
 
 Despite the improved performance, the models still have a problem in that 50\% of patient cases are inaccurately marked as \acrshort{ofi} positive. \acrshort{ml} methods generally require substantial amounts of data to perform effectively \cite{piccialli_survey_2021}. There are several ways to enhance the performance of \acrshort{ml} models, and the most basic and well-known is simply increasing the amount of data. Until now, the only option for doing so was by manually gathering more data and annotating it. This process is slow, and in some cases, not feasible due to a shortage of data.
 
+Another way of increasing data is by generating new synthetic data from already existing data, this is called synthetic data generation. \acrshort{ml} can be used for synthetic data generation by training generative models on real-world datasets to create new, artificial data with similar statistical properties and characteristics as the original data. \cite{}
+
+In the medical field, synthetic data generation can be used to create datasets that mimic real patient data, without compromising patient privacy. For example, a computer might be trained on a dataset of patient health records, and used to generate new records that have similar characteristics, such as age, gender, and medical conditions. These new records can be used to study and analyze medical data, without the risk of exposing sensitive patient information. They may also be used to increase performance of other \acrshort{ml} models. \cite{}
+
 Recently, the use of \acrfullpl{gan} to generate synthetic data has become a popular topic in image analysis \cite{pavan_kumar_generative_2021}.  A \acrshort{gan} is a type of artificial neural network consisting of two main components: a generator and a discriminator. The generator is trained to produce new data samples that resemble the input data, while the discriminator is trained to differentiate between the generated samples and the real data.
 
-The generator and discriminator are trained together in an adversarial manner. The generator aims to produce samples that the discriminator cannot identify as fake, while the discriminator strives to accurately identify the fake samples generated by the generator. This process allows the generator to learn to produce samples that resemble the input data, and the discriminator to learn to distinguish between real and generated data. As a result, the generator continually improves, producing data that more closely resembles the source and becomes increasingly difficult for the discriminator to identify as synthetic data.
+The generator and discriminator are trained together in an adversarial manner. The generator aims to produce samples that the discriminator cannot identify as fake, while the discriminator strives to accurately identify the fake samples generated by the generator. This process allows the generator to learn to produce samples that resemble the input data, and the discriminator to learn to distinguish between real and generated data. As a result, the generator continually improves, producing data that more closely resembles the source and becomes increasingly difficult for the discriminator to identify as synthetic data. \cite{}
+
+An example of this as the \acrfull{ctgan}, a specialised type of GAN that is specifically designed for generating synthetic tabular data. The "conditional" refers to the fact that the generator network takes as input not only a random noise vector, as in a normal \acrshort{gan}, but also a set of "conditioning" variables that specify some characteristics of the desired output. Such conditions could be for example the range that a variable can be generated in.
 
 In addition to generating more trainable data, some \acrshortpl{gan} are able to anonymise data \cite{liu_ppgan_2019} and provide an interface for being able to generate synthetic datasets of sensitive personal information that are completely anonymous. These synthetic datasets can, in theory, be distributed and increase the availability of medical datasets for researchers.
 
-Another type of generative model in artificial neural networks is the \acrfull{vae} \cite{kingma_auto-encoding_2013}. It is a simpler and more compact model that learns the probabilistic representation of a dataset, called the latent space. This representation is a compressed form of the input data that captures its most important features and variations. The \acrshort{vae} consists of two parts: an encoder and a decoder. The encoder maps the input data to a probability distribution in the latent space, while the decoder maps a sample from that distribution back to the original data space. By training the \acrshort{vae}, we learn a compact representation of the input data that highlights its important features and variations.
+Another type of generative model in artificial neural networks is the \acrfull{vae}. It is a simpler and more compact model that learns the probabilistic representation of a dataset, called the latent space. This representation is a compressed form of the input data that captures its most important features and variations. The \acrshort{vae} consists of two parts: an encoder and a decoder. The encoder maps the input data to a probability distribution in the latent space, while the decoder maps a sample from that distribution back to the original data space. By training the \acrshort{vae}, we learn a compact representation of the input data that highlights its important features and variations. \cite{kingma_auto-encoding_2013}
 
-The quality of the generated data from these methods often varies and is dependent on several factors, such as the quality and quantity of the ground truth data \cite{karras_training_2020}.  The major advantage of having a method for generating high-quality synthetic data is the ability to enlarge small datasets and train \acrshort{ml}  models in cases where it was not feasible before, or did not produce satisfactory results due to a lack of data. This has been previously explored in medical image analysis contexts where it has also been shown to improve cross-site generalisation \cite{sanaat_robust-deep_2022, bashyam_deep_2022}.
+The most commonly used \acrshort{vae} is the \acrfull{tvae}. Shortly, \acrshort{tvae} is trained to learn three different latent representations: one for the input data, one for a "positive" example that is similar to the input, and one for a "negative" example that is dissimilar to the input. By training the TVAE on this triplet of latent representations, it is possible to learn more robust and discriminative features than with a traditional VAE. \cite{}
 
-However, the use of \acrshortpl{gan} and \acrshortpl{vae} for structured tabular data is relatively uncommon and largely unexplored. There are few studies that investigate the possibility of generating synthetic tabular data in a medical context.
+The quality of the generated data from these methods often varies and is dependent on several factors, such as the quality and quantity of the baseline data \cite{karras_training_2020}.  The major advantage of having a method for generating high-quality synthetic data is the ability to enlarge small datasets and train \acrshort{ml}  models in cases where it was not feasible before, or did not produce satisfactory results due to a lack of data. This has been previously explored in medical image analysis contexts where it has also been shown to improve cross-site generalisation \cite{sanaat_robust-deep_2022, bashyam_deep_2022}.
+
+However, the use of \acrshortpl{gan} and \acrshortpl{vae} for structured tabular data is relatively uncommon and largely unexplored. There are few studies that investigate the possibility of generating synthetic tabular data in a trauma context \cite{}.
 
 \subsection{Aim}
-The aim of this article is to evaluate the effectiveness of using \acrshortpl{gan} and \acrshortpl{vae} for generating synthetic tabular data in a trauma setting, and to explore the potential of this approach for improving \acrshort{ofi} prediction models.
+The aim of this study is to evaluate the effectiveness of using \acrshortpl{gan} and \acrshortpl{vae} for generating synthetic tabular data in a trauma setting, and to explore the potential of this approach for improving \acrshort{ofi} prediction models.
 
 \section{Materials and Methods}
 We conducted a retrospective study using registry data from Karolinska University Hospital, comparing the performance of supervised machine learning models that were trained with synthetic data and those that were not, by analysing all trauma patients in the trauma registry and quality database from 2014 to 2021.
@@ -252,30 +270,28 @@ All model development and data preprocessing was carried out in Python. The mode
 A preprocessor was developed to preprocess both the training and test data without any data leakage. This was achieved by transforming continuous features using Yeo-Johnson's power transformation \cite{yeo_new_2000} and encoding nominal features using one-hot encoding. Ordinal features remained unchanged. Continuous features were imputed using the mean of the feature, ordinal features using the most frequent value, and nominal features using an "unknown" category. An exception was made for blood pressure and respiratory rate in the pre-hospital and emergency department, which were imputed using the mean value of the revised trauma score category \cite{ringdal_utstein_2008} if it existed. The preprocessor was trained on the training data and then applied to the test data, ensuring no data leakage between the test and training sets.
 
 \subsubsection*{Classification models}
-As suggested by Attegrim and Szolnoky et al. \cite{attergrim_predicting_2023}, the following traditional methods were implemented using scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, ensemble of decision trees, support vector machine, and k-nearest neighbor. The following boosting methods were implemented using their respective Python implementations: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was performed on all models using the first resampled training data, with a 5-fold cross-validation. The suggested parameters found in the documentation were optimized using Tree-structured Parzen Estimator \cite{bergstra_algorithms_2011} for a total of 1 hour per model.
+As suggested by Attergrim et al. \cite{attergrim_predicting_2023}, the following traditional methods were implemented using scikit-learn \cite{pedregosa_scikit_2011}: logistic regression, random forest, ensemble of decision trees, support vector machine, and $k$-nearest neighbor. The following boosting methods were implemented using their respective Python implementations: XGBoost \cite{chen_xgboost_2016}, LightGBM \cite{ke_lightgbm_2017}, and CatBoost \cite{prokhorenkova_catboost_2018}. Hyperparameter tuning was performed on all models using the first resampled training data, with a 5-fold cross-validation. The suggested parameters found in the documentation were optimized using Tree-structured Parzen Estimator \cite{bergstra_algorithms_2011} for a total of 1 hour per model.
 
 \subsubsection*{Synthesising models}
 The \acrfull{ctgan} \cite{xu_modeling_2019} and \acrfull{tvae} \cite{ishfaq_tvae_2018} models were implemented with the assistance of the Synthetic Data Vault framework \cite{patki_sdv_2016} in Python. The batch size was increased to 1000 samples to incorporate a higher number of minority cases in a single batch. The number of epochs trained was increased to 600. The standard parameters provided were otherwise used.
 
 \subsection{Statistical Analysis}
-\begin{figure}[h]
+All statistical analyses were performed using Python. The model analyses were conducted by splitting the data into an 80\%-20\% train-test and repeating the process 100 times using random resampling without replacement. The estimated 95\% \acrfull{ci} using $t$-distribution was calculated for \acrfull{auc} as well as the delta values, using all resamples. A significance level at $p$-value $< 0.05$ was set.
+
+The synthesising models were trained on the raw training data from each resample. The synthesising models generated an output dataset with an equal size to the input training data. If the number of generated \acrshort{ofi} positive cases was less than in the input, 1000 new batches were generated and the \acrshort{ofi} positive cases were added to the original generated dataset. The classification models were trained on either the pre-processed training data from the resample, the pre-processed output of the synthesising models, or a combination of both (\Cref{fig:modelflowchart}). During each training cycle, the classification models were tested on the pre-processed test data from the train-test split, and the \acrshort{auc} was calculated. This resulted in each classification model being evaluated five times for each resample: using the raw training data, the \acrshort{ctgan} synthetic data, a combination of the raw training data and \acrshort{ctgan} synthetic data, the \acrshort{tvae} synthetic data, and a combination of the raw training data and \acrshort{tvae} synthetic data. Each data input mentioned is referred to as a data group.
+
+\begin{figure}
     \centering
     \includegraphics[width=\textwidth]{figures/model_flowchart.pdf}
-    \caption{\textbf{Flowchart describing the process of evaluating the synthesising models.}\\
-        Process is replicated for each classification model and resample. Each arrow to "Train Classification Model" indicates an individual and separated training/evaluation cycle from the other data inputs.\\
+    \caption{\textbf{Flowchart describing the process of evaluating the synthesising models.} Process is replicated for each classification model and resample. Each arrow to "Train Classification Model" indicates an individual and separated training/evaluation cycle from the other data inputs.\\
         *Synthetic training data output by a data synthesising model.\\
         \textit{Definition of abbreviations:} CTGAN = Conditional tabular generative adversarial network; TVAE = Triplet based variational autoencoder.}
     \label{fig:modelflowchart}
 \end{figure}
 
-%% I think some more work is needed to describe the different sets of models created. In my understanding, you create one set of models for each "synthesiser" and then one set of baseline models. So for Logistic regression you have LRctgan, LRtvae, and LRbl, for random forest RFctgan, RFtvae, and RFbl, and so on. You then compare LRbl with LRctgan and LRbl with LRtvae. Do you also compare LRctgan with LRtvae? Will you calculate a mean delta and compare these, so that you can say if "on avarage" the ctgan performed better than tvae? 
-All statistical analyses were performed using Python. The model analyses were conducted by splitting the data into an 80\%-20\% train-test and repeating the process 100 times using random resampling without replacement. The estimated 95\% \acrfull{ci} using $t$-distribution was calculated for \acrfull{auc} as well as the delta values, using all resamples. A significance level at $p$-value $< 0.05$ was set.
-
-The synthesising models were trained on the raw training data from each resample. The synthesising models generated an output dataset with an equal size to the input training data. The classification models were trained on either the pre-processed training data from the resample, the pre-processed output of the synthesising models, or a combination of both (\Cref{fig:modelflowchart}). During each training cycle, the classification models were tested on the pre-processed test data from the train-test split, and the \acrshort{auc} was calculated. This resulted in each classification model being evaluated five times for each resample: using the raw training data, the \acrshort{ctgan} synthetic data, a combination of the raw training data and \acrshort{ctgan} synthetic data, the \acrshort{tvae} synthetic data, and a combination of the raw training data and \acrshort{tvae} synthetic data. Each data input mentioned is referred to as a data group.
-
 The performance of the models was assessed on the test split from each resample and compared using \acrshort{auc}. Additionally, the delta \acrshort{auc} for each model was calculated for each resample. The performance of a classification model was compared both to models within the same data group and to models in different data groups. Finally, the average delta \acrshort{auc} was calculated for each data group and compared to other groups.
 
-Descriptive statistics, including mean, \acrfull{sd}, median, minimum, and maximum for continuous features, and prevalence for categorical features, were calculated. Descriptive statistics were computed for both the baseline and synthetic datasets.
+Descriptive statistics, including mean, \acrfull{sd}, median, minimum, and maximum for continuous and ordinal features, and prevalence for categorical features, were calculated. The missing prevalence for all features were calculated. Descriptive statistics were computed for both the baseline and synthetic datasets.
 
 \subsection{Ethical Considerations}
 The group under investigation in this study, trauma patients, can be considered a vulnerable population due to the severe outcomes that often result from major trauma, such as disability and death. Thus, special consideration must be given to the ethics of conducting this study. It is important to note that only anonymous registry data was used in this study, and no identifiable personal data was accessible by the authors or the \acrshort{ml} models, this is one of the important measurements taken to reduce possible ethical complications.
@@ -290,21 +306,24 @@ In conclusion, the benefits of this study, as measured against the four principl
 
 \section{Results}
 \subsection{Patient Characteristics}
-\begin{figure}[ht]
+
+During the years 2014 to 2021, a population of \num{12107} trauma patients were identified. For \num{6314} patients were excluded due to not being screened for an \acrshort{ofi} by either audit filters or individual review, zero patients were excluded for being under the age of 15. In total \num{5793} patients were eligible and included in the study. A large majority of these cases, \num{5453} patients, reached the consensus that no \acrshort{ofi} was present while \num{340} patients were deemed to have at least one \acrshort{ofi}. A summarised graph of inclusion and exclusion criteria including the process to an \acrshort{ofi} is seen in \Cref{fig:flowchart}.
+
+\begin{figure}
     \centering
-    \includegraphics[width=0.85\textwidth]{figures/flowchart.pdf}
-    \caption{\textbf{Flowchart describing the exclusions made and including the process to determine a case with \acrshort{ofi}.}\\
+    \includegraphics[width=0.6\textwidth]{figures/flowchart.pdf}
+    \caption{\textbf{Flowchart describing the exclusions made and including the process to determine a case with \acrshort{ofi}.} The amount of patient cases brought up at a morbidity conference is unknown in the current dataset.\\
         *Defined at 30-days post trauma.\\
         \textit{Definition of abbreviations:} OFI = opportunity for improvement.}
     \label{fig:flowchart}
 \end{figure}
-During the years 2014 to 2021, a population of \num{12107} trauma patients were identified. For \num{6314} patients were excluded due to not being screened for an \acrshort{ofi} by either audit filters or individual review, zero patients were excluded for being under the age of 15. In total \num{5793} patients were eligible and included in the study. A large majority of these cases, \num{5453} patients, reached the consensus that no \acrshort{ofi} was present while \num{340} patients were deemed to have at least one \acrshort{ofi}. A summarised graph of inclusion and exclusion criteria including the process to an \acrshort{ofi} is seen in \Cref{fig:flowchart}.
 
-\begin{table}[t!]
+Selected patient characteristics are summarised in \Cref{tab:tableone}. The trauma group as a whole had a mean age of 46 (\acrshort{sd}: 21) while the \acrshort{ofi} and \acrshort{ofi} negative subgroup had a mean age of 50 (\acrshort{sd}: 22) and 45 (\acrshort{sd}: 21) respectively. The majority were male ($n = $ \num{3509}, 61\%) and the overall group had a mortality of 6\% ($n = $ \num{331}). The \acrshort{ofi} group had a higher mean \acrshort{iss} (18 [\acrshort{sd}: 10] vs 10 [\acrshort{sd}: 11]) and were admitted to the intensive care unit more frequently (30\% [$n = $ \num{286}] vs 14\% [$n = $ \num{761}]). Data for emergency procedure was less missing in the \acrshort{ofi} subgroup with 54\% ($n = $ 182) of records missing data compared to 82\% ($n = $ \num{4452}) in the \acrshort{ofi} negative group. Furthermore, the emergency procedure "other" was more common in the \acrshort{ofi} group (26\% [$n = $ \num{88}] vs 13\% [$n = $ \num{699}]).
+
+\begin{table}[p]
     \centering
     \renewcommand{\arraystretch}{0.9}
-    \caption{\textbf{Patient demographic and clinical characteristics}.\\
-        Subdivided by \acrshort{ofi} outcome for ground truth data.}
+    \caption{\textbf{Patient demographic and clinical characteristics}. Subdivided by \acrshort{ofi} outcome for baseline data.}
     \label{tab:tableone}
     \scalebox{0.7}{
         \begin{tabular}{lccc}
@@ -376,51 +395,95 @@ During the years 2014 to 2021, a population of \num{12107} trauma patients were 
         \textit{Definition of abbreviations:} OFI = Opportunity for Improvement; ED = Emergency Department; GCS = Glascow Coma Scale.}
 \end{table}
 
-Selected patient characteristics are summarised in \Cref{tab:tableone}. The trauma group as a whole had a mean age of 46 (\acrshort{sd}: 21) while the \acrshort{ofi} and \acrshort{ofi} negative subgroup had a mean age of 50 (\acrshort{sd}: 22) and 45 (\acrshort{sd}: 21) respectively. The majority were male ($n = $ \num{3509}, 61\%) and the overall group had a mortality of 6\% ($n = $ \num{331}). The \acrshort{ofi} group had a higher mean \acrshort{iss} (18 [\acrshort{sd}: 10] vs 10 [\acrshort{sd}: 11]) and were admitted to the intensive care unit more frequently (30\% [$n = $ \num{286}] vs 14\% [$n = $ \num{761}]). Data for emergency procedure was less missing in the \acrshort{ofi} subgroup with 54\% ($n = $ 182) of records missing data compared to 82\% ($n = $ \num{4452}) in the \acrshort{ofi} negative group. Furthermore, the emergency procedure "other" was more common in the \acrshort{ofi} group (26\% [$n = $ \num{88}] vs 13\% [$n = $ \num{699}]).
-
-Selected patient characteristics for the data produced by the synthesising models are presented in \Cref{tab:tableonectgan,tab:tableonetvae} in the appendix.
+Selected patient characteristics for the data produced by the synthesising models for the first resample are presented in \Cref{tab:tableonectgan,tab:tableonetvae} in the appendix. The \acrshort{tvae} dataset produced fewer \acrshort{ofi} cases ($n = 101$) then both baseline and \acrshort{ctgan} ($n = 500$). The overall mean age was 56 (\acrshort{sd}: 23) and 51 (\acrshort{sd}: 26) for \acrshort{ctgan} and \acrshort{tvae} respectively. The \acrshort{ctgan} data group produced more missing data, the most missing data was found in the Emergency procedure predictor with 87\% (76\% in the \acrshort{tvae} group) and the least with 0\% in the Intubated predictor (0\% in the \acrshort{tvae} group). Excluding the intubated predictor, the lowest number of missing values was found in the Age, Gender, Dead at 30 days, Highest level of care, and Emergency department GCS with 36\% of data points missing values in the \acrshort{ctgan} group. The same predictors in the \acrshort{tvae} group were all missing values in 6\% of data points. The mean emergency department Glascow coma scale was 21 and 20 for \acrshort{ctgan} and \acrshort{tvae} respectively. Additionally, the \acrshort{tvae} group did not produce "Laparotomy", "Thoracotomy", and "Pelvis packing" for Emergency procedure.
 
 \subsection{Model Performance}
-\begin{table}[ht!]
+The overall best data group was the baseline group with 6 out of 8 models scoring significantly their best \acrshort{auc} score in that group. The $k$-nearest neighbour model scored its best \acrshort{auc} in the \acrshort{ctgan} + baseline group. However, this performance improvement was insignificant with a mean \acrshort{auc} of 0.717 (0.711, 0.722) in the \acrshort{ctgan} + baseline group and an \acrshort{auc} of 0.715 (0.71, 0.721) in the baseline group.
+
+The random forest model achieved the best overall \acrshort{auc} result out of all classification models in all data groups, it scored an \acrshort{auc} of 0.792 (0.787, 0.797) in the baseline group, this was not significant compared to the \acrshort{ctgan} + baseline group (\acrshort{auc}: 0.784 [0.779, 0.788]). The second best model, with an overlapping \acrshort{ci} to the baseline random forest model, was CatBoost (\acrshort{auc}: 0.789 [0.784, 0.794]). The worst performing model was the support vector machine, scoring its best \acrshort{auc} in the baseline group (\acrshort{auc}: 0.675 [0.668, 0.681]). All synthesising models generated data that achieved significant discrimination result (AUC $> 0.5$) apart from \acrshort{ctgan}, where the support vector machine could not achieve a significant discriminatory \acrshort{auc} (\acrshort{auc}: 0.501 [0.489, 0.514]). Additionally, when adding the \acrshort{ctgan} and baseline data, the support vector machine scored the worst overall score (\acrshort{auc}: 0.449 [0.424, 0.474]). See \Cref{tab:modelperf} for \acrshort{auc} metrics for all classification models in each data group and corresponding \acrshortpl{ci}.
+
+
+\begin{table}
     \centering
-    \renewcommand{\arraystretch}{1.5}
-    \caption{\textbf{Model performances}.}
+    \renewcommand{\arraystretch}{0.8}
+    \caption{\textbf{\acrshort{auc} performance in predicting \acrshort{ofi}.} The average \acrshort{auc} (95\% \acrshort{ci}) for classification models in each data group. The best performing data group for each classification model is displayed in bold.}
     \label{tab:modelperf}
     \scalebox{0.75}{
-        \begin{tabular}{lP{3cm}P{3cm}P{3cm}P{3cm}P{3cm}}
+        \begin{tabular}{lccccc}
             \toprule
-            Model               & Baseline                             & CTGAN                       & TVAE                        & CTGAN + Baseline                     & TVAE + Baseline             \\
+            \textbf{Model}                       & \textbf{Baseline}       & \textbf{CTGAN} & \textbf{TVAE}  & \textbf{CTGAN + Baseline} & \textbf{TVAE + Baseline} \\
             \midrule
-            CatBoost            & \textbf{0.789\newline(0.784, 0.794)} & 0.573\newline(0.551, 0.579) & 0.681\newline(0.615, 0.659) & 0.775\newline(0.772, 0.782)          & 0.779\newline(0.771, 0.781) \\\hline
-            Extra Trees         & \textbf{0.775\newline(0.771, 0.781)} & 0.611\newline(0.586, 0.611) & 0.596\newline(0.585, 0.622) & 0.763\newline(0.757, 0.768)          & 0.763\newline(0.76, 0.77)   \\\hline
-            k-NN                & 0.715\newline(0.71, 0.721)           & 0.541\newline(0.52, 0.545)  & 0.521\newline(0.521, 0.533) & \textbf{0.718\newline(0.711, 0.722)} & 0.686\newline(0.682, 0.695) \\\hline
-            LightGBM            & \textbf{0.78\newline(0.778, 0.788)}  & 0.548\newline(0.537, 0.56)  & 0.627\newline(0.587, 0.62)  & 0.769\newline(0.767, 0.776)          & 0.773\newline(0.766, 0.777) \\\hline
-            Logistic Regression & \textbf{0.768\newline(0.759, 0.769)} & 0.595\newline(0.58, 0.609)  & 0.669\newline(0.592, 0.643) & 0.747\newline(0.742, 0.754)          & 0.752\newline(0.745, 0.756) \\\hline
-            Random forest       & \textbf{0.792\newline(0.787, 0.797)} & 0.638\newline(0.619, 0.639) & 0.643\newline(0.603, 0.636) & 0.783\newline(0.779, 0.788)          & 0.779\newline(0.772, 0.783) \\\hline
-            SVM                 & \textbf{0.679\newline(0.668, 0.681)} & 0.508\newline(0.489, 0.514) & 0.66\newline(0.593, 0.64)   & 0.387\newline(0.424, 0.474)          & 0.648\newline(0.641, 0.655) \\\hline
-            XGBoost             & \textbf{0.77\newline(0.767, 0.776)}  & 0.578\newline(0.559, 0.588) & 0.697\newline(0.602, 0.657) & 0.749\newline(0.743, 0.754)          & 0.744\newline(0.739, 0.751) \\
+            \multirow{2}{*}{CatBoost}            & \textbf{0.789}          & 0.565          & 0.637          & 0.777                     & 0.776                    \\
+                                                 & \textbf{(0.784, 0.794)} & (0.551, 0.579) & (0.615, 0.659) & (0.772, 0.782)            & (0.771, 0.781)           \\[0.5em]
+            \multirow{2}{*}{Extra Trees}         & \textbf{0.776}          & 0.599          & 0.604          & 0.762                     & 0.765                    \\
+                                                 & \textbf{(0.771, 0.781)} & (0.586, 0.611) & (0.585, 0.622) & (0.757, 0.768)            & (0.76, 0.77)             \\[0.5em]
+            \multirow{2}{*}{k-NN}                & 0.715                   & 0.533          & 0.527          & \textbf{0.717}            & 0.689                    \\
+                                                 & (0.71, 0.721)           & (0.52, 0.545)  & (0.521, 0.533) & \textbf{(0.711, 0.722)}   & (0.682, 0.695)           \\[0.5em]
+            \multirow{2}{*}{LightGBM}            & \textbf{0.783}          & 0.549          & 0.604          & 0.772                     & 0.772                    \\
+                                                 & \textbf{(0.778, 0.788)} & (0.537, 0.56)  & (0.587, 0.62)  & (0.767, 0.776)            & (0.766, 0.777)           \\[0.5em]
+            \multirow{2}{*}{Logistic Regression} & \textbf{0.764}          & 0.595          & 0.618          & 0.748                     & 0.751                    \\
+                                                 & \textbf{(0.759, 0.769)} & (0.58, 0.609)  & (0.592, 0.643) & (0.742, 0.754)            & (0.745, 0.756)           \\[0.5em]
+            \multirow{2}{*}{Random forest}       & \textbf{0.792}          & 0.629          & 0.619          & 0.784                     & 0.777                    \\
+                                                 & \textbf{(0.787, 0.797)} & (0.619, 0.639) & (0.603, 0.636) & (0.779, 0.788)            & (0.772, 0.783)           \\[0.5em]
+            \multirow{2}{*}{SVM}                 & \textbf{0.675}          & 0.501          & 0.616          & 0.449                     & 0.648                    \\
+                                                 & \textbf{(0.668, 0.681)} & (0.489, 0.514) & (0.593, 0.64)  & (0.424, 0.474)            & (0.641, 0.655)           \\[0.5em]
+            \multirow{2}{*}{XGBoost}             & \textbf{0.771}          & 0.573          & 0.629          & 0.749                     & 0.745                    \\
+                                                 & \textbf{(0.767, 0.776)} & (0.559, 0.588) & (0.602, 0.657) & (0.743, 0.754)            & (0.739, 0.751)           \\
             \bottomrule
         \end{tabular}
+
     }
+    \caption*{\small \textit{Definition of abbreviations:} AUC = \acrlong{auc}; CI = \acrlong{ci}; k-NN = $k$-nearest neighbour; OFI = \acrlong{ofi}; SVM = support vector machine.}
 \end{table}
 
-\begin{figure}[ht!]
+The average receiver operating characteristic curve for classification models within a data group is presented in \Cref{fig:roc}. The baseline, \acrshort{ctgan} + baseline, and \acrshort{tvae} + baseline data groups achieve a similar receiver operating characteristic curve and \acrshort{auc}. The baseline group scored the best overall average \acrshort{auc} of 0.753. The \acrshort{ctgan} compared to \acrshort{tvae} data group curve achieved a better performance in the high false positive and true positive rate range while a lower performance in the low false positive and true positive rate. This is also seen in the curve when the baseline data was added to each group. The worst performing data group was the \acrshort{ctgan} group with an average \acrshort{auc} of 0.555.
+
+\begin{figure}
     \centering
     \includegraphics[width=0.85\textwidth]{figures/roc.pdf}
-    \caption{\textbf{Receiver operating characteristic curve for synthesising models.}\\
-        *Defined at 30-days post trauma.\\
+    \caption{\textbf{Average receiver operating characteristic curve for classification models within a data group.} Each data group curve was calculated by taking the average curve for all classification within a data group. \\
         \textit{Definition of abbreviations:} AUC = \Acrlong{auc}; CTGAN = \Acrlong{ctgan}; TVAE = \Acrlong{tvae}.}
-    \label{fig:flowchart}
+    \label{fig:roc}
 \end{figure}
 
 
 \section{Discussion}
+The aim of this study was to evaluate the effectiveness of generating synthetic data in a trauma setting using a \acrshort{gan} and \acrshort{vae} in improving \acrshort{ofi} prediction models. The generated data from the \acrshort{gan} and \acrshort{vae} tested resulted in significantly worse performance in predicting \acrshortpl{ofi} with classification models compared models trained with the baseline data. The average performance loss compared to the baseline data in terms of \acrshort{auc} was 0.198 and 0.187 for the \acrshort{gan} and \acrshort{vae} respectively. The results display the current infeasibility of generating synthetic data to improve \acrshort{ofi} prediction models in a trauma setting.
+
+The \acrshort{vae} based model implemented in this study showed an overall better performance in generating data than the \acrshort{gan} based model. 4 of the classification models achieved significantly better performance using the \acrshort{vae} data compared to the \acrshort{gan} data, the remaining four models were non-inferior. However, the average \acrshort{auc} difference for the groups as a whole was minimal, 0.566 vs 0.555 for the \acrshort{vae} and \acrshort{gan} respectively. This indicates that generating synthetic data in this context is a difficult task rather than the fault of the methods.
+
+An interesting observation is that when combining the \acrshort{vae} or \acrshort{gan} data with the baseline data, the difference from the baseline data, though significant, was minimal. The average difference of the three best performing classification models (CatBoost, LightGBM, random forest) baseline performance versus the \acrshort{gan} + baseline performance was 0.01. For \acrshort{vae}, it was also 0.01. Despite the baseline and synthetic datasets being equally large, the classification models were barely affected by the poor synthetic data. The test data used in each resample split was not presented to the models until evaluation, meaning that the classification models learnt the most important features in the combined data despite the noise added by the synthetic data.
+
+Another interesting observation is of the receiver operating characteristic curve for the \acrshort{gan} and \acrshort{vae} models. While similar, the \acrshort{gan} model seems to be able to produce a dataset that a model with a high sensitivity (true positive rate) performs with less false positives (i.e. higher specificity) compared to the \acrshort{vae}. While the \acrshort{vae} model, on the other hand, is able to generate a dataset, that compared to the \acrshort{gan} dataset, a model with low sensitivity has higher specificity. In the context of \acrshortpl{ofi}, the \acrshort{gan} generated dataset is preferable. This is due to, when detecting \acrshort{ofi}, a high sensitivity is preferred. In the case of Attergrim et al. \cite{attergrim_predicting_2023} the sensitivity for the models were set at 93\% to match the sensitivity of the current audit filter system; at that sensitivity, the \acrshort{gan} data outperforms the \acrshort{vae} data in terms of specificity.
+
+The baseline results show similarities to those of Attergrim et al. \cite{attergrim_predicting_2023} who found that LightGBM and random forest the be the best performing models. Hernandez et. al. \cite{hernandez_synthetic_2022} reported a varying performance of synthetic data generation when it comes to \acrshortpl{gan} in different medical context. One of the conclusion drawn by Hernandez and colleagues was that the existing \acrshort{gan}-based approaches are not generalisable to all types of tabular data. This is further proven by the present study where the tested \acrshort{ctgan} displayed a poor performance compared to baseline. Abedi et al. \cite{abedi_gan-based_2022} investigated how training data size affected the performance of classification models trained with synthetic data. For certain training data sizes the results show similarity to the results found in the current study. This may indicate that for the time being, there is not enough data to use the methods tested.
+
+The quality of the various predictors data for the synthetic datasets various. For example, both synthesisers erroneously produced Glascow coma scale scores over 15. The \acrshort{tvae} model's dataset overall means and incidences are closer to the ones of the baseline dataset. However, the \acrshort{tvae} model seems to produce a less varied \acrshort{ofi} positive group. As seen in \Cref{tab:tableonetvae}, \acrshort{tvae} for \acrshort{ofi} positive cases ($n = 101$) produced 100\% male, 95\% not dead at 30 days, and 94\% with the intensive care unit as the highest level of care. Compared with the baseline characteristics in \Cref{tab:tableone}, the incidence for the same predictors were 64\%, 84\%, and 30\% respectively. When it comes to categorical predictors, the \acrshort{ctgan} model's data was more aligned with the baseline characteristics.
+
+Finally, despite the results of the current study, if it would be possible to generate synthetic data to improve \acrshort{ml} prediction models' performance, it would most likely be better to use the synthesising model directly as a prediction model. Synthetic data generators can not add more information that was not already in the baseline data, they learn features and correlations in the baseline data and use them to generate data. Similarly, classification models learn features and correlations in the baseline data but use them to predict a class instead. Thus, to be able to produce quality data that a classification model can learn from, the synthetic data generator has to learn features and correlations in the baseline dataset better than what the classification models can. Therefore, if we would exchange the synthetic data generator's task from generating data to classifying data we could expect the same, if not better, performance than the previously used classification model. This has been explored by \cite{}.
+
+\subsection{Strengths and Limitations}
+There are several strengths of the present study, one of them being the development. The models are statistical analysis code were developed without running it on the true data. Secondly, the methodology uses a robust way of validation. Resampling using 100 resamples allows us to virtually simulate rerunning the experiment 100 times and provides us with the ability to calculate \acrshort{ci} to ensure statistical significance between models. Thirdly, the classification models are based off a already validated methodology using state-of-the-art models. This means we can compare our baseline results to previous results to ensure that the current models have been applied correctly.
+
+Though, limitations to exist. Mainly, the sample size is relatively small ($n = 5793$). This can be compared with the original implementation studies that use at least tens of thousands of data points, and in many times much more \cite{}. Furthermore, only two synthetic data generation models were tested, there exists many more types of models, some more specific for medical data \cite{hernandez_synthetic_2022}.
+
+\subsection{Practical Applications}
+The current study, despite the inferiority results of the tested synthetic data generation models, developed a framework for being able to validate synthetic data generation methods using \acrshort{ml} models for \acrshort{ofi} prediction. This framework is modular and allows, with minimal effort, testing and validating further synthesising models. Furthermore, the framework is extensible when it comes to the classification models and allows for the addition of more.
+
+The implication of this is that synthetic data generation methods can be rapidly tested and validated. If, or when, a synthetic data generation method is validated that can generate accurate synthetic trauma datasets, these could in theory be distributed to the wider scientific community. This could have a major significance, mainly to further the possibility of open and reproducible science in medicine. It could lead to a easier distribution of data, facilitating simpler methods for external validation. Finally, it allows for the possibility that several research groups can work on the same problem.
+
+Though, there are som ethical questions that has to be taken into consideration. One of them being, does the synthetic dataset require the same ethical considerations as the true data? There also lies a problem in ensuring that the synthetic data represents the population as a whole. As seen with the \acrshort{tvae} generated data, the \acrshort{ofi} positive population was purely male dominated. This could lead to gender, age or other socio-demographic factors being over or under represented in the synthetic datasets. It is vital the ensure that the future synthetic dataset do not suffer from this impeding problem to assure health equity.
+
+\subsection{Future Studies}
+Future studies should investigate whether other synthetic data generation techniques can provide beneficiary results. This could be done using the framework developed in the present study. This would further investigate if synthetic data generation is possible for smaller trauma datasets.
+
+Additionally, supplementary methods should be implemented for evaluating the generated datasets in terms of data quality and privacy. The current method only tests the quality in terms of \acrshort{ofi} prediction, however, many more correlations exist. Furthermore, the actual performance of being able to generate anonymised datasets was not tested. Both these questions could be tested by implementing the multifaceted benchmarking framework for synthetic electronic health records introduced by Yan et al. \cite{yan_multifaceted_2022}.
+
+%TODO: Investigate other methods for increasing performance
+% Investigate methods for evaluating dataset performance/privacy
 
 \section{Conclusions}
-
-\section*{Contributions}
-
-\section*{Acknowledgement}
+The present study indicates that current \acrshort{gan} and \acrshort{vae} based methods are not appropriate for synthetic data generation in \acrshort{ofi} prediction in trauma patient care. The \acrshort{ctgan} and \acrshort{tvae} models tested resulted in significantly worse performance when training \acrshort{ml} models for \acrshort{ofi} prediction. However, further work is needed to asses if other \acrshort{gan} based models with further tweaking could provide acceptable results.
 
 \newpage
 
@@ -530,8 +593,7 @@ Selected patient characteristics for the data produced by the synthesising model
     \begin{table}[t!]
         \centering
         \renewcommand{\arraystretch}{0.9}
-        \caption{\textbf{Patient demographic and clinical characteristics}.\\
-            Subdivided by \acrshort{ofi} outcome for \acrshort{ctgan} data.}
+        \caption{\textbf{Patient demographic and clinical characteristics}. Subdivided by \acrshort{ofi} outcome for \acrshort{ctgan} data.}
         \label{tab:tableonectgan}
         \scalebox{0.7}{
             \begin{tabular}{lccc}
@@ -606,8 +668,7 @@ Selected patient characteristics for the data produced by the synthesising model
     \begin{table}[t!]
         \centering
         \renewcommand{\arraystretch}{0.9}
-        \caption{\textbf{Patient demographic and clinical characteristics}.\\
-            Subdivided by \acrshort{ofi} outcome for \acrshort{tvae} data.}
+        \caption{\textbf{Patient demographic and clinical characteristics}. Subdivided by \acrshort{ofi} outcome for \acrshort{tvae} data.}
         \label{tab:tableonetvae}
         \scalebox{0.7}{
             \begin{tabular}{lccc}

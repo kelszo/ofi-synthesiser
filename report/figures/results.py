@@ -53,7 +53,7 @@ for resample in results:
 
             auc_per_resample[model_name][synth_method].append(auc_score)
 
-main_result_table = pd.DataFrame(index=model_names, columns=synth_method_names)
+main_result_table = pd.DataFrame()
 
 best_data_source = {model_name: [0, ""] for model_name in model_names}
 
@@ -62,21 +62,28 @@ for model_name in auc_per_resample:
     for synth_method in model_results:
         aucs = model_results[synth_method]
 
-        median = np.round(statistics.median(aucs), 3)
+        mean = np.round(statistics.mean(aucs), 3)
         ci = np.round(st.norm.interval(alpha=0.95, loc=np.mean(aucs), scale=st.sem(aucs)), 3)
 
-        main_result_table.loc[model_name, synth_method] = f"{median}\\newline({ci[0]}, {ci[1]})"
+        main_result_table.loc[model_name, synth_method] = f"{mean}"
+        main_result_table.loc[f"{model_name}:CI", synth_method] = f"({ci[0]}, {ci[1]})"
 
-        if median > best_data_source[model_name][0]:
-            best_data_source[model_name] = [median, synth_method]
+        if mean > best_data_source[model_name][0]:
+            best_data_source[model_name] = [mean, synth_method]
 
 for model_name in best_data_source:
     _, data_source = best_data_source[model_name]
 
     main_result_table.loc[model_name, data_source] = "\\textbf{" + main_result_table.loc[model_name, data_source] + "}"
+    main_result_table.loc[f"{model_name}:CI", data_source] = (
+        "\\textbf{" + main_result_table.loc[f"{model_name}:CI", data_source] + "}"
+    )
 
-main_result_table.index = map(lambda x: format_classification_models[x], main_result_table.index)
-main_result_table.columns = map(lambda x: format_synth_models[x], main_result_table.columns)
+
+main_result_table.index = map(lambda x: format_classification_models.get(x, ""), main_result_table.index)
+main_result_table.index = map(lambda x: "\multirow{2}{*}{" + x + "}" if x != "" else "", main_result_table.index)
+
+main_result_table.columns = map(lambda x: format_synth_models.get(x, ""), main_result_table.columns)
 
 print(main_result_table.to_latex(escape=False))
 
@@ -116,7 +123,7 @@ for synth_method in synth_method_names:
 
     plt.plot(fpr, tpr, label=f"{format_synth_models[synth_method]} (AUC = {auc:.{3}f})")
 
-plt.plot([0, 1], [0, 1], linestyle="--", linewidth=1, color="grey", label="No discrimination")
+plt.plot([0, 1], [0, 1], linestyle="--", linewidth=1, color="grey", label="No discrimination (AUC = 0.5)")
 
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.0])
